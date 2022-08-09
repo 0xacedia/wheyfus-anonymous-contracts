@@ -51,4 +51,3 @@ And there are 2 periphery functions to make things easier:
 
 Finance stuff is cool but gym girls (2d) are cooler. they are so fucking tight and muscular and HOT. gosh.
 Sometimes i look at them and justt think about how THICK and juicy they can get. imagine a wheyfu crushing ur head between her legs. damn.
-<img src="./assets/wheyfu1.gif" alt="wheyfu1" width="100%"/>
