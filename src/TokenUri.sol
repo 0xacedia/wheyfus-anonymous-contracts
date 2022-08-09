@@ -49,7 +49,8 @@ contract TokenUri {
         ":3 :3 :3",
         "autism is literally not real. pure psyop",
         "hope ur supping vit d and zinc! remember to drink water!!",
-        "nofap x nomattress x nosugar -> BEST COMBO"
+        "nofap x nomattress x nosugar -> BEST COMBO",
+        "hmph!"
     ];
 
     Wheyfu public wheyfu;
