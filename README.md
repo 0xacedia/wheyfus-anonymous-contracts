@@ -11,7 +11,7 @@ forge install
 forge test
 ```
 
-Here's how it works (oopsie whoopsie fucki wuckie!):
+Here's how it works:
 
 * Step 1: You mint some wheyfu's
 * Step 2: Take equal parts wheyfus and eth and LP them into a shared sudoswap pool.
