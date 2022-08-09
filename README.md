@@ -27,6 +27,7 @@ Here's how it works (oopsie whoopsie fucki wuckie!):
 NB:
 * The longer you bond, the higher your relative yield boost.
 * Each option lasts for 5 years and has a strike of N wheyfus * 0.1 ether.
+* 9000 wheyfus in the form of option contracts are distributed over 900 days.
 
 
 <img src="./assets/wheyfu3.gif" alt="wheyfu3" width="100%"/>

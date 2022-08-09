@@ -32,10 +32,10 @@ contract Bonding is IERC1271, Owned {
     BondingNft public immutable bondingNft;
 
     uint256 public constant TOTAL_REWARDS = 9000 * 1e18;
-    uint256 public constant REWARD_DURATION = 365 days;
+    uint256 public constant REWARD_DURATION = 900 days;
     uint256 public constant STRIKE = 0.1 ether;
     uint256 public immutable rewardRate = TOTAL_REWARDS / REWARD_DURATION;
-    uint256 public immutable optionExpiration = block.timestamp + 1500 days;
+    uint256 public immutable optionExpiration = block.timestamp + 1825 days;
     uint256 public immutable finishAt = block.timestamp + REWARD_DURATION;
     uint256 public immutable startAt = block.timestamp;
 
