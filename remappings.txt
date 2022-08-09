@@ -1,0 +1,5 @@
+@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
+ERC721A/=lib/ERC721A/contracts/
+solmate/=lib/solmate/src/
+base64/=lib/base64/
+hot-chain-svg/=lib/hot-chain-svg/contracts
