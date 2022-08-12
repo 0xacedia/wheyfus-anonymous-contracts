@@ -5,6 +5,7 @@ libs = ['lib']
 fuzz_runs = 64
 gas_reports = ['Bonding', 'Wheyfu', 'PuttyV2']
 optimizer_runs = 300_000
+solc_version = '0.8.15'
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
 
