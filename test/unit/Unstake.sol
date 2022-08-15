@@ -20,9 +20,10 @@ contract UnstakeTest is Fixture {
         w.unstake(tokenId);
 
         // assert
-        assertEq(
+        assertApproxEqAbs(
             co.balanceOf(address(this)),
             w.rewardRate() * 30 days,
+            2,
             "Should have withdrawn call option tokens"
         );
     }
@@ -97,7 +98,7 @@ contract UnstakeTest is Fixture {
 
     function testItCannotWithdrawBondThatHasntMatured() public {
         // act
-        skip(30 days - 1);
+        skip(7 days - 1);
         vm.expectRevert("Bond not matured");
         w.unstake(tokenId);
     }
@@ -115,7 +116,7 @@ contract UnstakeTest is Fixture {
         skip(1 days);
 
         deal(address(lp), babe, amount, true);
-        tokenId = w.stake(amount, 2);
+        tokenId = w.stake(amount, 3);
 
         uint256 totalSupply = w.stakedTotalSupply();
         skip(112 days);
@@ -128,9 +129,10 @@ contract UnstakeTest is Fixture {
         uint256 expectedReward = (w.rewardRate() * 112 days * virtualAmount) /
             totalSupply;
 
-        assertEq(
+        assertApproxEqAbs(
             co.balanceOf(babe),
             expectedReward,
+            2,
             "Should have withdrawn correct amount of call option tokens"
         );
     }

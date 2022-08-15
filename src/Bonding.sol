@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
@@ -22,8 +22,8 @@ contract Bonding is IERC1271, Owned {
         uint8 termIndex;
     }
 
-    uint256[] public terms = [1 days, 30 days, 90 days, 180 days, 365 days];
-    uint256[] public termBoosters = [1e18, 1.2e18, 1.5e18, 2e18, 3e18];
+    uint256[] public terms = [0, 7 days, 30 days, 90 days, 180 days, 365 days];
+    uint256[] public termBoosters = [1e18, 1.1e18, 1.2e18, 1.5e18, 2e18, 3e18];
 
     MintBurnToken public immutable callOptionToken;
     MintBurnToken public immutable lpToken;
@@ -101,10 +101,8 @@ contract Bonding is IERC1271, Owned {
             (uint256(amount) * termBoosters[termIndex]) / 1e18
         );
 
-        // temporarily burn lp tokens from sender (until withdrawal)
-        if (burnShares) {
-            lpToken.burn(msg.sender, amount);
-        }
+        // transfer lp tokens from sender
+        lpToken.transferFrom(msg.sender, address(this), amount);
 
         emit Stake(tokenId, bond);
     }
@@ -138,8 +136,8 @@ contract Bonding is IERC1271, Owned {
             (amount * termBoosters[bond.termIndex]) / 1e18
         );
 
-        // mint lp tokens back to sender
-        lpToken.mint(msg.sender, amount);
+        // send lp tokens back to sender
+        lpToken.transfer(msg.sender, amount);
 
         // mint call  option rewards to sender
         callOptionAmount = earned(tokenId);

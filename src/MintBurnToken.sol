@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 
 import "solmate/tokens/ERC20.sol";
 import "solmate/auth/Owned.sol";
@@ -28,5 +28,31 @@ contract MintBurnToken is ERC20, Owned {
 
     function burn(address from, uint256 amount) public onlyMinterBurner {
         _burn(from, amount);
+    }
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 amount
+    ) public override returns (bool) {
+        // allow the owner to transfer tokens from any account (owner should be wheyfu contract)
+        uint256 allowed = msg.sender == owner
+            ? type(uint256).max
+            : allowance[from][msg.sender]; // Saves gas for limited approvals.
+
+        if (allowed != type(uint256).max)
+            allowance[from][msg.sender] = allowed - amount;
+
+        balanceOf[from] -= amount;
+
+        // Cannot overflow because the sum of all user
+        // balances can't exceed the max uint256 value.
+        unchecked {
+            balanceOf[to] += amount;
+        }
+
+        emit Transfer(from, to, amount);
+
+        return true;
     }
 }

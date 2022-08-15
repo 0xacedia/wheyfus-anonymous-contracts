@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -90,6 +90,11 @@ contract Wheyfu is Bonding, ERC721, ERC721TokenReceiver, PuttyV2Handler {
         address to,
         address from
     ) internal returns (uint256) {
+        require(
+            mintWhitelist[from] >= amount,
+            "Not whitelisted for this amount"
+        );
+
         for (uint256 i = totalSupply; i < totalSupply + amount; i++) {
             _mint(to, i + 1);
         }
@@ -159,7 +164,7 @@ contract Wheyfu is Bonding, ERC721, ERC721TokenReceiver, PuttyV2Handler {
             }
         }
 
-        // mint shares
+        // mint shares to sender
         uint256 _totalSupply = lpToken.totalSupply();
         shares = _totalSupply == 0
             ? msg.value * tokenIds.length
@@ -167,10 +172,7 @@ contract Wheyfu is Bonding, ERC721, ERC721TokenReceiver, PuttyV2Handler {
                 (msg.value * _totalSupply) / _tokenReserves,
                 (tokenIds.length * _totalSupply) / _nftReserves
             );
-
-        if (mintShares) {
-            lpToken.mint(msg.sender, shares);
-        }
+        lpToken.mint(msg.sender, shares);
 
         // deposit eth to sudoswap pool
         payable(pair).transfer(msg.value);

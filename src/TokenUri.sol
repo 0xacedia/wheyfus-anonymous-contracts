@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 
 import {Wheyfu} from "./Wheyfu.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
@@ -42,13 +42,14 @@ contract TokenUri {
         "EEK",
         "YOGA PANTS!?>@",
         "wowieeeeee ur so strong (not as strong as me thoughh ;_;)",
-        "money or weights? tough choice. idc as long as i have YOU xx",
-        "youre gunna make it. srs. YOU are GOINHG TO MAKE IT !!",
+        "money or weights? idc as long as i have YOU xx",
+        "gunna make it. srs. YOU are GOINHG TO MAKE IT !!",
         "UwU",
         "OwO",
         ":3 :3 :3",
         "autism is literally not real. pure psyop",
-        "hope ur supping vit d and zinc! remember to drink water!!",
+        "hope ur supping vit d and zinc!",
+        "remember to drink water!!",
         "nofap x nomattress x nosugar -> BEST COMBO",
         "hmph!"
     ];
@@ -98,7 +99,7 @@ contract TokenUri {
                     string.concat(
                         svg.prop("x", "10"),
                         svg.prop("y", "20"),
-                        svg.prop("font-size", "12"),
+                        svg.prop("font-size", "14"),
                         svg.prop("fill", "white")
                     ),
                     text
@@ -107,7 +108,7 @@ contract TokenUri {
                     string.concat(
                         svg.prop("x", "10"),
                         svg.prop("y", "40"),
-                        svg.prop("font-size", "12"),
+                        svg.prop("font-size", "14"),
                         svg.prop("fill", "white")
                     ),
                     "I'm not yet revealed :3"
@@ -116,7 +117,7 @@ contract TokenUri {
                     string.concat(
                         svg.prop("x", "10"),
                         svg.prop("y", "60"),
-                        svg.prop("font-size", "12"),
+                        svg.prop("font-size", "14"),
                         svg.prop("fill", "white")
                     ),
                     string.concat(
@@ -146,11 +147,11 @@ contract TokenUri {
                     string.concat(
                         svg.prop("x", "10"),
                         svg.prop("y", "20"),
-                        svg.prop("font-size", "12"),
+                        svg.prop("font-size", "16"),
                         svg.prop("fill", "white")
                     ),
                     string.concat(
-                        "Fresh off the press: Ticket for ",
+                        "Fresh: Ticket for ",
                         Strings.toString(type(uint256).max - tokenId),
                         " wheyfus"
                     )
@@ -170,7 +171,7 @@ contract TokenUri {
             '{"name":"',
             "Wheyfus anonymous :3",
             '","description":"',
-            "a group of very aesthetic girls",
+            "a group of very aesthetic <ppl>",
             '","image": "data:image/svg+xml;base64,',
             Base64.encode(bytes(svgStr)),
             '","attributes": [',

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 
 import "forge-std/Test.sol";
 import "lssvm/LSSVMPairFactory.sol";
@@ -75,11 +75,11 @@ contract Fixture is Test {
 
         // transfer ownership to Wheyfu
         lp.setMinterBurner(address(w), true);
-        lp.setOwner(address(0));
+        lp.setOwner(address(w));
 
         // transfer ownership to co
         co.setMinterBurner(address(w), true);
-        co.setOwner(address(0));
+        co.setOwner(address(w));
 
         // set whitelist
         w.whitelistMinter(address(this), 100);
