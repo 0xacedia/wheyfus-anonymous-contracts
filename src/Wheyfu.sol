@@ -132,15 +132,6 @@ contract Wheyfu is Bonding, ERC721, ERC721TokenReceiver, PuttyV2Handler {
         uint256 minPrice,
         uint256 maxPrice
     ) public payable returns (uint256 shares) {
-        shares = _addLiquidity(tokenIds, minPrice, maxPrice, true);
-    }
-
-    function _addLiquidity(
-        uint256[] calldata tokenIds,
-        uint256 minPrice,
-        uint256 maxPrice,
-        bool mintShares
-    ) internal returns (uint256 shares) {
         // check current price is in between min and max
         uint256 _tokenReserves = tokenReserves();
         uint256 _nftReserves = nftReserves();
@@ -271,8 +262,8 @@ contract Wheyfu is Bonding, ERC721, ERC721TokenReceiver, PuttyV2Handler {
         uint256 maxPrice,
         uint256 termIndex
     ) public payable returns (uint256 tokenId) {
-        uint256 shares = _addLiquidity(tokenIds, minPrice, maxPrice, false);
-        tokenId = _stake(uint96(shares), termIndex, false);
+        uint256 shares = addLiquidity(tokenIds, minPrice, maxPrice);
+        tokenId = stake(uint96(shares), termIndex);
     }
 
     /**

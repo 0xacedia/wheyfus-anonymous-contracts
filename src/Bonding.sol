@@ -72,14 +72,6 @@ contract Bonding is IERC1271, Owned {
         public
         returns (uint256 tokenId)
     {
-        tokenId = _stake(amount, termIndex, true);
-    }
-
-    function _stake(
-        uint96 amount,
-        uint256 termIndex,
-        bool burnShares
-    ) internal returns (uint256 tokenId) {
         // mint the bond
         totalBondSupply += 1;
         tokenId = totalBondSupply;

@@ -64,11 +64,17 @@ contract DeployScript is Script {
 
         // authorize wheyfu to mint/burn lp tokens then give up control
         lp.setMinterBurner(address(wheyfu), true);
-        lp.setOwner(address(0));
+        lp.setOwner(address(wheyfu));
 
         // authorize wheyfu to mint/burn call option tokens then give up control
         co.setMinterBurner(address(wheyfu), true);
-        co.setOwner(address(0));
+
+        // TODO: JUST FOR TESTING (REMOVE THIS AT LAUNCH) ______
+        co.setMinterBurner(msg.sender, true);
+        co.mint(msg.sender, 500 * 1e18);
+        // TODO: JUST FOR TESTING (REMOVE THIS AT LAUNCH) ^^^^^
+
+        co.setOwner(address(wheyfu));
 
         // authorize the putty contract to mint 1000 wheyfu NFTs
         // this can be increased in the future to 9000 but set it
@@ -77,7 +83,7 @@ contract DeployScript is Script {
 
         // seed the pair with some liquidity
         wheyfu.whitelistMinter(msg.sender, 50);
-        wheyfu.mint(5);
+        wheyfu.mint(10);
 
         uint256[] memory tokenIds = new uint256[](5);
         tokenIds[0] = 1;
@@ -85,6 +91,11 @@ contract DeployScript is Script {
         tokenIds[2] = 3;
         tokenIds[3] = 4;
         tokenIds[4] = 5;
-        wheyfu.addLiquidity{value: 0.03 ether}(tokenIds, 0, type(uint256).max);
+        wheyfu.addLiquidityAndStake{value: 0.03 ether}(
+            tokenIds,
+            0,
+            type(uint256).max,
+            1
+        );
     }
 }
