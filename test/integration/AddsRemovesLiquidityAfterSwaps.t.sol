@@ -10,39 +10,59 @@ import "../Fixture.t.sol";
 contract AddsRemovesLiquidityAfterSwaps is Fixture, ERC721TokenReceiver {
     using stdStorage for StdStorage;
 
-    uint256[] public tokenIds;
-
     receive() external payable {}
 
     function setUp() public {}
 
     function testItAddsRemovesCorrectLiquidityAfterSwaps() public {
-        // arange
-        uint256 depositAmount = 100;
-        w.mint(depositAmount);
+        // arrange
+        w.whitelistMinter(babe, 500);
+        deal(babe, 10 ether);
 
-        for (uint256 i = 0; i < depositAmount; i++) {
-            tokenIds.push(i + 1);
-        }
-
-        w.addLiquidity{value: 1 ether}(tokenIds, 0, type(uint256).max);
-        buy(10);
-
-        uint256 tokenAmount = address(pair).balance / 10;
-        uint256 nftAmount = w.balanceOf(address(pair)) / 10;
-
+        // act
+        uint256 tokenAmount = 1 ether;
+        uint256 nftAmount = 100;
         w.mint(nftAmount);
-        delete tokenIds;
-        for (uint256 i = depositAmount; i < nftAmount; i++) {
-            tokenIds.push(i + 1);
+        uint256[] memory tokenIds = new uint256[](nftAmount);
+        for (uint256 i = 0; i < nftAmount; i++) {
+            tokenIds[i] = i + 1;
         }
-
         w.addLiquidity{value: tokenAmount}(tokenIds, 0, type(uint256).max);
         buy(10);
+
+        vm.startPrank(babe);
+        uint256 babeTokenAmount = 1 ether;
+        uint256 babeNftAmount = 15;
+        w.mint(babeNftAmount);
+        uint256[] memory babeTokenIds = new uint256[](babeNftAmount);
+        for (uint256 i = 0; i < babeNftAmount; i++) {
+            babeTokenIds[i] = nftAmount + i + 1;
+        }
+        w.addLiquidity{value: babeTokenAmount}(
+            babeTokenIds,
+            0,
+            type(uint256).max
+        );
+        buy(5);
+        vm.stopPrank();
+
+        uint256 nftBalance = w.balanceOf(address(pair));
+        uint256 tokenBalance = address(w).balance;
+
+        assertEq(
+            w.balanceOf(address(this)),
+            20,
+            "Should have transferred bought nfts"
+        );
+        assertEq(
+            pair.spotPrice(),
+            tokenBalance,
+            "Spot price should match token reserves"
+        );
+        assertEq(pair.delta(), nftBalance, "Delta should match nft reserves");
     }
 
-    function buy(uint256 inputAmount) internal {
-        uint256 numItemsToBuy = 3;
+    function buy(uint256 numItemsToBuy) internal {
         (, , , uint256 inputValue, ) = pair.getBuyNFTQuote(numItemsToBuy);
 
         uint256 inputAmount = pair.swapTokenForAnyNFTs{value: inputValue}(
