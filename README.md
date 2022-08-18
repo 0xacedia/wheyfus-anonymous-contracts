@@ -45,7 +45,6 @@ Bonding.sol:
 * unstake
 * convertToOption
 
-And there are 2 periphery functions to make things easier:
+And there is 1 periphery functions to make things easier:
 
 * addLiquidityAndStake
-* multiConvertToOption

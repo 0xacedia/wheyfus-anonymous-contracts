@@ -103,25 +103,6 @@ contract ConvertOptionTest is Fixture {
         w.convertToOption(0, 1);
     }
 
-    function testMultiConvertOption() public {
-        // arrange
-        deal(address(co), address(this), 519e18, true);
-        uint256[] memory nonces = new uint256[](11);
-        for (uint256 i = 0; i < 11; i++) {
-            nonces[i] = i;
-        }
-
-        // act
-        w.multiConvertToOption(517, nonces);
-
-        // assert
-        assertEq(
-            co.balanceOf(address(this)),
-            2e18,
-            "Should have burned call options"
-        );
-    }
-
     function testIsValidSignatureReturnsFalse() public {
         // arrange
         bytes memory empty;

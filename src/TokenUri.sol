@@ -8,13 +8,11 @@ import "hot-chain-svg/SVG.sol";
 
 contract TokenUri {
     string[] public colors = [
-        "black",
-        "green",
-        "pink",
-        "red",
-        "orange",
-        "blue",
-        "purple"
+        "#CDB4DB",
+        "#FFC8DD",
+        "#FFAFCC",
+        "#BDE0FE",
+        "#A2D2FF"
     ];
 
     string[] public texts = [
@@ -51,7 +49,15 @@ contract TokenUri {
         "hope ur supping vit d and zinc!",
         "remember to drink water!!",
         "nofap x nomattress x nosugar -> BEST COMBO",
-        "hmph!"
+        "hmph!",
+        "gosh im so sweaty!",
+        "every day is leg day ;)",
+        "can you spot me pls! it's my first time",
+        "that's not fair! you're so much bigger than me!",
+        "time for a water break!",
+        "it's sooooo hot in here",
+        "you don't mind if I hop in this set do you ;-;",
+        "ummmm im just here to work out!"
     ];
 
     Wheyfu public wheyfu;

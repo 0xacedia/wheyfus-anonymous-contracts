@@ -82,8 +82,8 @@ contract Fixture is Test {
         co.setOwner(address(w));
 
         // set whitelist
-        w.whitelistMinter(address(this), 100);
-        w.whitelistMinter(address(p), 100);
+        w.whitelistMinter(address(this), 500);
+        w.whitelistMinter(address(p), 500);
     }
 
     function setupSudoswap() public {

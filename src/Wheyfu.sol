@@ -146,15 +146,6 @@ contract Wheyfu is Bonding, ERC721, ERC721TokenReceiver, PuttyV2Handler {
             _nftReserves + tokenIds.length
         );
 
-        // deposit tokens to sudoswap pool
-        for (uint256 i = 0; i < tokenIds.length; ) {
-            _transferFrom(msg.sender, address(pair), tokenIds[i]);
-
-            unchecked {
-                i++;
-            }
-        }
-
         // mint shares to sender
         uint256 _totalSupply = lpToken.totalSupply();
         shares = _totalSupply == 0
@@ -164,6 +155,15 @@ contract Wheyfu is Bonding, ERC721, ERC721TokenReceiver, PuttyV2Handler {
                 (tokenIds.length * _totalSupply) / _nftReserves
             );
         lpToken.mint(msg.sender, shares);
+
+        // deposit tokens to sudoswap pool
+        for (uint256 i = 0; i < tokenIds.length; ) {
+            _transferFrom(msg.sender, address(pair), tokenIds[i]);
+
+            unchecked {
+                i++;
+            }
+        }
 
         // deposit eth to sudoswap pool
         payable(pair).transfer(msg.value);
@@ -200,6 +200,11 @@ contract Wheyfu is Bonding, ERC721, ERC721TokenReceiver, PuttyV2Handler {
         pair.withdrawETH(tokenAmount);
         pair.withdrawERC721(IERC721(address(this)), tokenIds);
 
+        // burn shares
+        uint256 _totalSupply = lpToken.totalSupply();
+        uint256 shares = (_totalSupply * tokenIds.length) / _nftReserves;
+        lpToken.burn(msg.sender, shares);
+
         // send tokens to user
         for (uint256 i = 0; i < tokenIds.length; ) {
             _transferFrom(address(this), msg.sender, tokenIds[i]);
@@ -208,11 +213,6 @@ contract Wheyfu is Bonding, ERC721, ERC721TokenReceiver, PuttyV2Handler {
                 i++;
             }
         }
-
-        // burn shares
-        uint256 _totalSupply = lpToken.totalSupply();
-        uint256 shares = (_totalSupply * tokenIds.length) / _nftReserves;
-        lpToken.burn(msg.sender, shares);
 
         // send eth to user
         payable(msg.sender).transfer(tokenAmount);
@@ -325,6 +325,18 @@ contract Wheyfu is Bonding, ERC721, ERC721TokenReceiver, PuttyV2Handler {
         delete getApproved[id];
 
         emit Transfer(from, to, id);
+
+        require(
+            to.code.length == 0 ||
+                ERC721TokenReceiver(to).onERC721Received(
+                    msg.sender,
+                    from,
+                    id,
+                    ""
+                ) ==
+                ERC721TokenReceiver.onERC721Received.selector,
+            "UNSAFE_RECIPIENT"
+        );
     }
 
     function safeTransferFrom(

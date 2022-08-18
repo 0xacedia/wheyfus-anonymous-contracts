@@ -200,23 +200,6 @@ contract Bonding is IERC1271, Owned {
         callOptionToken.burn(msg.sender, amount);
     }
 
-    /**
-        @notice mints several call options (each contract can have a max of 50 assets). 
-        @param numAssets the total amount of assets to put into the call options.
-        @param nonces the nonces for each call option.
-     */
-    function multiConvertToOption(uint256 numAssets, uint256[] memory nonces)
-        public
-    {
-        uint256 i = 0;
-        while (numAssets > 0) {
-            uint256 amount = Math.min(50, numAssets);
-            convertToOption(amount, nonces[i]);
-            numAssets -= amount;
-            i += 1;
-        }
-    }
-
     uint256 public mintingOption = 1;
 
     function isValidSignature(bytes32, bytes memory)
