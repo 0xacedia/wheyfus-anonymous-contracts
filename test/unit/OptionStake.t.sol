@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 import "../Fixture.t.sol";
 
-contract StakeTest is Fixture {
+contract OptionStakeTest is Fixture {
     uint96 public amount;
 
     function setUp() public {
@@ -52,11 +52,8 @@ contract StakeTest is Fixture {
 
         // assert
         assertEq(w.bonds(tokenId).termIndex, 1, "Should have saved bond term index");
-
         assertEq(w.bonds(tokenId).depositTimestamp, block.timestamp, "Should have saved bond deposit timestamp");
-
         assertEq(w.bonds(tokenId).depositAmount, amount, "Should have saved bond deposit amount");
-
         assertEq(w.bonds(tokenId).rewardPerTokenCheckpoint, 0, "Should have inited staked bond reward per token paid");
     }
 
@@ -87,7 +84,6 @@ contract StakeTest is Fixture {
 
         // assert
         assertEq(b.ownerOf(tokenId), address(this), "Should have minted bond NFT");
-
         assertEq(w.totalBondSupply(), 1, "Should incremented total bond supply");
     }
 }

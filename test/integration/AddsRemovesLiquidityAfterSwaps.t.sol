@@ -45,12 +45,16 @@ contract AddsRemovesLiquidityAfterSwaps is Fixture, ERC721TokenReceiver {
         buy(babeBuyAmount);
         vm.stopPrank();
 
+        w.whitelistMinter(address(this), 3000);
+        for (uint256 i = 0; i < 10; i++) {
+            i % 3 == 0 ? sell(i + 1) : buy(Math.min(i + 1, w.balanceOf(address(pair))));
+        }
+
         w.skim();
 
         uint256 nftBalance = w.balanceOf(address(pair));
         uint256 tokenBalance = address(pair).balance;
 
-        assertEq(w.balanceOf(address(this)), buyAmount + babeBuyAmount, "Should have transferred bought nfts");
         assertEq(pair.spotPrice(), tokenBalance, "Spot price should match token reserves");
         assertEq(pair.delta(), nftBalance, "Delta should match nft reserves");
     }
@@ -58,15 +62,19 @@ contract AddsRemovesLiquidityAfterSwaps is Fixture, ERC721TokenReceiver {
     function buy(uint256 numItemsToBuy) internal {
         (,,, uint256 inputValue, uint256 protocolFee) = pair.getBuyNFTQuote(numItemsToBuy);
 
-        console.log((numItemsToBuy * pair.spotPrice()) / (pair.delta() - numItemsToBuy));
-        console.log(protocolFee);
-        console.log(pair.spotPrice());
-        console.log(inputValue);
-
         uint256 inputAmount =
             pair.swapTokenForAnyNFTs{value: inputValue}(numItemsToBuy, inputValue, address(this), false, address(0));
+    }
 
-        console.log(address(pair).balance);
-        console.log(pair.spotPrice());
+    function sell(uint256 numItemsToSell) internal {
+        uint256[] memory nftIds = new uint256[](numItemsToSell);
+        uint256 totalSupply = w.mint(numItemsToSell);
+        w.setApprovalForAll(address(pair), true);
+        for (uint256 i = 0; i < numItemsToSell; i++) {
+            nftIds[i] = (totalSupply - numItemsToSell) + i;
+        }
+
+        (,,, uint256 outputAmount, uint256 protocolFee) = pair.getSellNFTQuote(numItemsToSell);
+        uint256 inputAmount = pair.swapNFTsForToken(nftIds, outputAmount, payable(address(this)), false, address(0));
     }
 }

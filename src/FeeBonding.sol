@@ -43,11 +43,11 @@ contract FeeBonding {
     /// @dev Calculated by summing total lp tokens staked * yield booster.
     uint96 public feeStakedTotalSupply;
 
+    /// @notice The nft contract that represents bonds.
+    BondingNft public immutable feeBondingNft;
+
     /// @notice The ERC20 token that represents lp shares in the sudoswap pool.
     MintBurnToken private immutable lpToken;
-
-    /// @notice The nft contract that represents bonds.
-    BondingNft private immutable bondingNft;
 
     /// @notice The sudoswap pool.
     LSSVMPairMissingEnumerableETH private pair;
@@ -57,7 +57,7 @@ contract FeeBonding {
 
     constructor(address _lpToken) {
         lpToken = MintBurnToken(_lpToken);
-        bondingNft = new BondingNft();
+        feeBondingNft = new BondingNft();
     }
 
     /**
@@ -88,13 +88,13 @@ contract FeeBonding {
      * @param termIndex index into the terms array which tells how long to stake for.
      */
     function feeStake(uint96 amount, uint256 termIndex) public returns (uint256 tokenId) {
+        // update the rewards for everyone
+        skim();
+
         // mint the bond
         feeTotalBondSupply += 1;
         tokenId = feeTotalBondSupply;
-        bondingNft.mint(msg.sender, tokenId);
-
-        // update the rewards for everyone
-        skim();
+        feeBondingNft.mint(msg.sender, tokenId);
 
         // set the bond parameters
         FeeBond storage bond = _bonds[tokenId];
@@ -116,19 +116,19 @@ contract FeeBonding {
      */
     function feeUnstake(uint256 tokenId) public returns (uint256 rewardAmount) {
         // check that the user owns the bond
-        require(msg.sender == bondingNft.ownerOf(tokenId), "Not owner");
+        require(msg.sender == feeBondingNft.ownerOf(tokenId), "Not owner");
 
         // check that the bond has matured
         FeeBond memory bond = _bonds[tokenId];
         require(block.timestamp >= bond.depositTimestamp + terms[bond.termIndex], "Bond not matured");
 
-        // burn the bond
-        bondingNft.burn(tokenId);
-
         // update the rewards for everyone
         skim();
 
-        // update last update time and staked total supply
+        // burn the bond
+        feeBondingNft.burn(tokenId);
+
+        // update staked total supply
         uint256 amount = bond.depositAmount;
         feeStakedTotalSupply -= uint96((amount * termBoosters[bond.termIndex]) / 1e18);
 
@@ -159,7 +159,7 @@ contract FeeBonding {
      * @param tokenId The tokenId to fetch info for.
      * @return bondDetails The bond details.
      */
-    function feeBonds(uint256 tokenId) public view returns (Bond memory) {
+    function feeBonds(uint256 tokenId) public view returns (FeeBond memory) {
         return _bonds[tokenId];
     }
 }

@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 import "../Fixture.t.sol";
 
-contract UnstakeTest is Fixture {
+contract OptionUnstakeTest is Fixture {
     uint96 public amount;
     uint256 public tokenId;
 

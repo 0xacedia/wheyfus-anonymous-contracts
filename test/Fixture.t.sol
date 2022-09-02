@@ -32,6 +32,7 @@ contract Fixture is Test {
 
     MintBurnToken public lp;
     BondingNft public b;
+    BondingNft public feeB;
     PuttyV2 public p;
 
     LSSVMPairFactory public sudoPairFactory;
@@ -60,11 +61,13 @@ contract Fixture is Test {
         w = new Wheyfu(address(lp), address(co), address(p), address(weth));
         t = new TokenUri(payable(address(w)));
         b = w.bondingNft();
+        feeB = w.feeBondingNft();
 
         uint256[] memory empty = new uint256[](0);
         pair = sudoPairFactory.createPairETH(
             IERC721(address(w)), xykCurve, payable(0), LSSVMPair.PoolType.TRADE, 0, fee, 0, empty
         );
+        vm.label(address(pair), "Pair");
 
         w.setPair(payable(address(pair)));
         w.setTokenUri(address(t));
