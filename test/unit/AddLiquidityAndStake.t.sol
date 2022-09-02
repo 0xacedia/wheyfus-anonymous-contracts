@@ -27,11 +27,7 @@ contract AddLiquidityAndStakeTest is Fixture {
         w.addLiquidityAndStake{value: deposit}(tokenIds, 0, 0, 1);
 
         // assert
-        assertEq(
-            address(pair).balance,
-            deposit,
-            "Should have transferred ETH to sudo"
-        );
+        assertEq(address(pair).balance, deposit, "Should have transferred ETH to sudo");
     }
 
     function testItReceivesBondNft() public {
@@ -39,18 +35,9 @@ contract AddLiquidityAndStakeTest is Fixture {
         uint256 deposit = 1 ether;
 
         // act
-        uint256 tokenId = w.addLiquidityAndStake{value: deposit}(
-            tokenIds,
-            0,
-            0,
-            1
-        );
+        uint256 tokenId = w.addLiquidityAndStake{value: deposit}(tokenIds, 0, 0, 1);
 
         // assert
-        assertEq(
-            b.ownerOf(tokenId),
-            address(this),
-            "Should have minted bond nft to depositer"
-        );
+        assertEq(b.ownerOf(tokenId), address(this), "Should have minted bond nft to depositer");
     }
 }

@@ -27,11 +27,7 @@ contract AdminTest is Fixture {
         w.closeWhitelist();
 
         // assert
-        assertEq(
-            w.closedWhitelist(),
-            true,
-            "Should have set whitelist as closed"
-        );
+        assertEq(w.closedWhitelist(), true, "Should have set whitelist as closed");
     }
 
     function testItCannotCloseWhitelistIfNotAdmin() public {

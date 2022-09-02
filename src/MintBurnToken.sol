@@ -7,11 +7,10 @@ import "solmate/auth/Owned.sol";
 contract MintBurnToken is ERC20, Owned {
     mapping(address => bool) public whitelistedMinterBurner;
 
-    constructor(
-        string memory _name,
-        string memory _symbol,
-        uint8 _decimals
-    ) ERC20(_name, _symbol, _decimals) Owned(msg.sender) {}
+    constructor(string memory _name, string memory _symbol, uint8 _decimals)
+        ERC20(_name, _symbol, _decimals)
+        Owned(msg.sender)
+    {}
 
     modifier onlyMinterBurner() virtual {
         require(whitelistedMinterBurner[msg.sender], "UNAUTHORIZED");
@@ -30,18 +29,13 @@ contract MintBurnToken is ERC20, Owned {
         _burn(from, amount);
     }
 
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) public override returns (bool) {
+    function transferFrom(address from, address to, uint256 amount) public override returns (bool) {
         // allow the owner to transfer tokens from any account (owner should be wheyfu contract)
-        uint256 allowed = msg.sender == owner
-            ? type(uint256).max
-            : allowance[from][msg.sender]; // Saves gas for limited approvals.
+        uint256 allowed = msg.sender == owner ? type(uint256).max : allowance[from][msg.sender]; // Saves gas for limited approvals.
 
-        if (allowed != type(uint256).max)
+        if (allowed != type(uint256).max) {
             allowance[from][msg.sender] = allowed - amount;
+        }
 
         balanceOf[from] -= amount;
 

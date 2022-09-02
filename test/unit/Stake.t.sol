@@ -20,11 +20,7 @@ contract StakeTest is Fixture {
         w.stake(amount, 0);
 
         // assert
-        assertEq(
-            balanceBefore - lp.balanceOf(address(this)),
-            amount,
-            "Should have burned lp tokens"
-        );
+        assertEq(balanceBefore - lp.balanceOf(address(this)), amount, "Should have burned lp tokens");
     }
 
     function testItUpdatesTotalStakedSupply() public {
@@ -36,11 +32,7 @@ contract StakeTest is Fixture {
         w.stake(amount, termIndex);
 
         // assert
-        assertEq(
-            w.stakedTotalSupply(),
-            (amount * termBooster) / 1e18,
-            "Should have updated staked total supply"
-        );
+        assertEq(w.stakedTotalSupply(), (amount * termBooster) / 1e18, "Should have updated staked total supply");
     }
 
     function testItUpdatesLastUpdateTime() public {
@@ -51,11 +43,7 @@ contract StakeTest is Fixture {
         w.stake(amount, 1);
 
         // assert
-        assertEq(
-            w.lastUpdateTime(),
-            block.timestamp,
-            "Should have updated last update time"
-        );
+        assertEq(w.lastUpdateTime(), block.timestamp, "Should have updated last update time");
     }
 
     function testItSavesBondDetails() public {
@@ -63,42 +51,22 @@ contract StakeTest is Fixture {
         uint256 tokenId = w.stake(amount, 1);
 
         // assert
-        assertEq(
-            w.bonds(tokenId).termIndex,
-            1,
-            "Should have saved bond term index"
-        );
+        assertEq(w.bonds(tokenId).termIndex, 1, "Should have saved bond term index");
 
-        assertEq(
-            w.bonds(tokenId).depositTimestamp,
-            block.timestamp,
-            "Should have saved bond deposit timestamp"
-        );
+        assertEq(w.bonds(tokenId).depositTimestamp, block.timestamp, "Should have saved bond deposit timestamp");
 
-        assertEq(
-            w.bonds(tokenId).depositAmount,
-            amount,
-            "Should have saved bond deposit amount"
-        );
+        assertEq(w.bonds(tokenId).depositAmount, amount, "Should have saved bond deposit amount");
 
-        assertEq(
-            w.bonds(tokenId).rewardPerTokenCheckpoint,
-            0,
-            "Should have inited staked bond reward per token paid"
-        );
+        assertEq(w.bonds(tokenId).rewardPerTokenCheckpoint, 0, "Should have inited staked bond reward per token paid");
     }
 
-    function testItSetsBondRewardPerTokenCheckpointAndRewardPerTokenStored()
-        public
-    {
+    function testItSetsBondRewardPerTokenCheckpointAndRewardPerTokenStored() public {
         // arrange
         uint256 duration = 50;
         w.stake(amount, 1);
         skip(duration);
         deal(address(lp), address(this), amount);
-        uint256 expectedRewardPerTokenPaid = (w.rewardRate() *
-            duration *
-            1e18) / ((amount * w.termBoosters(1)) / 1e18);
+        uint256 expectedRewardPerTokenPaid = (w.rewardRate() * duration * 1e18) / ((amount * w.termBoosters(1)) / 1e18);
 
         // act
         uint256 tokenId = w.stake(amount, 1);
@@ -110,11 +78,7 @@ contract StakeTest is Fixture {
             "Should have updated staked bond reward per token paid"
         );
 
-        assertEq(
-            w.rewardPerTokenStored(),
-            expectedRewardPerTokenPaid,
-            "Should have stored reward per token"
-        );
+        assertEq(w.rewardPerTokenStored(), expectedRewardPerTokenPaid, "Should have stored reward per token");
     }
 
     function testItMintsBondNft() public {
@@ -122,16 +86,8 @@ contract StakeTest is Fixture {
         uint256 tokenId = w.stake(amount, 1);
 
         // assert
-        assertEq(
-            b.ownerOf(tokenId),
-            address(this),
-            "Should have minted bond NFT"
-        );
+        assertEq(b.ownerOf(tokenId), address(this), "Should have minted bond NFT");
 
-        assertEq(
-            w.totalBondSupply(),
-            1,
-            "Should incremented total bond supply"
-        );
+        assertEq(w.totalBondSupply(), 1, "Should incremented total bond supply");
     }
 }

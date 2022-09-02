@@ -9,23 +9,15 @@ contract WheyfuInitTest is Fixture {
     function setUp() public {}
 
     function testItSetsMaxSupply() public {
-        assertEq(w.MAX_SUPPLY(), 10_000, "Should have set max supply");
+        assertEq(w.MAX_SUPPLY(), 15_000, "Should have set max supply");
     }
 
     function testItSetsWhitelistAsOpen() public {
-        assertEq(
-            w.closedWhitelist(),
-            false,
-            "Should have set whitelist as open"
-        );
+        assertEq(w.closedWhitelist(), false, "Should have set whitelist as open");
     }
 
     function testItSetsWhitelistedSupplyTo0() public {
-        assertEq(
-            w.whitelistedSupply(),
-            200,
-            "Should have set whitelisted supply to be 200"
-        );
+        assertEq(w.whitelistedSupply(), 1000, "Should have set whitelisted supply to be 1000");
     }
 
     function testItSetsTotalSupplyTo200() public {

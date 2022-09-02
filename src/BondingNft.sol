@@ -36,18 +36,11 @@ contract BondingNft is ERC721, Owned {
         emit Transfer(owner, address(0), id);
     }
 
-    function transferFrom(
-        address from,
-        address to,
-        uint256 id
-    ) public override {
+    function transferFrom(address from, address to, uint256 id) public override {
         require(from == _ownerOf[id], "WRONG_FROM");
         require(to != address(0), "INVALID_RECIPIENT");
         require(
-            msg.sender == from ||
-                isApprovedForAll[from][msg.sender] ||
-                msg.sender == getApproved[id],
-            "NOT_AUTHORIZED"
+            msg.sender == from || isApprovedForAll[from][msg.sender] || msg.sender == getApproved[id], "NOT_AUTHORIZED"
         );
 
         _ownerOf[id] = to;
@@ -61,13 +54,7 @@ contract BondingNft is ERC721, Owned {
         return type(uint256).max - 1;
     }
 
-    function tokenURI(uint256 id)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
+    function tokenURI(uint256 id) public view virtual override returns (string memory) {
         return "1";
     }
 }

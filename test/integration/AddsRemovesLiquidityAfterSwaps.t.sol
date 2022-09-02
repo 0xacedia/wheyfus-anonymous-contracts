@@ -2,6 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
+import "forge-std/console.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import {ERC721TokenReceiver} from "solmate/tokens/ERC721.sol";
 
@@ -28,7 +29,8 @@ contract AddsRemovesLiquidityAfterSwaps is Fixture, ERC721TokenReceiver {
             tokenIds[i] = i + 1;
         }
         w.addLiquidity{value: tokenAmount}(tokenIds, 0, type(uint256).max);
-        buy(10);
+        uint256 buyAmount = 10;
+        buy(buyAmount);
 
         vm.startPrank(babe);
         uint256 babeTokenAmount = 1 ether;
@@ -38,39 +40,33 @@ contract AddsRemovesLiquidityAfterSwaps is Fixture, ERC721TokenReceiver {
         for (uint256 i = 0; i < babeNftAmount; i++) {
             babeTokenIds[i] = nftAmount + i + 1;
         }
-        w.addLiquidity{value: babeTokenAmount}(
-            babeTokenIds,
-            0,
-            type(uint256).max
-        );
-        buy(5);
+        w.addLiquidity{value: babeTokenAmount}(babeTokenIds, 0, type(uint256).max);
+        uint256 babeBuyAmount = 5;
+        buy(babeBuyAmount);
         vm.stopPrank();
 
-        uint256 nftBalance = w.balanceOf(address(pair));
-        uint256 tokenBalance = address(w).balance;
+        w.skim();
 
-        assertEq(
-            w.balanceOf(address(this)),
-            20,
-            "Should have transferred bought nfts"
-        );
-        assertEq(
-            pair.spotPrice(),
-            tokenBalance,
-            "Spot price should match token reserves"
-        );
+        uint256 nftBalance = w.balanceOf(address(pair));
+        uint256 tokenBalance = address(pair).balance;
+
+        assertEq(w.balanceOf(address(this)), buyAmount + babeBuyAmount, "Should have transferred bought nfts");
+        assertEq(pair.spotPrice(), tokenBalance, "Spot price should match token reserves");
         assertEq(pair.delta(), nftBalance, "Delta should match nft reserves");
     }
 
     function buy(uint256 numItemsToBuy) internal {
-        (, , , uint256 inputValue, ) = pair.getBuyNFTQuote(numItemsToBuy);
+        (,,, uint256 inputValue, uint256 protocolFee) = pair.getBuyNFTQuote(numItemsToBuy);
 
-        uint256 inputAmount = pair.swapTokenForAnyNFTs{value: inputValue}(
-            numItemsToBuy,
-            inputValue,
-            address(this),
-            false,
-            address(0)
-        );
+        console.log((numItemsToBuy * pair.spotPrice()) / (pair.delta() - numItemsToBuy));
+        console.log(protocolFee);
+        console.log(pair.spotPrice());
+        console.log(inputValue);
+
+        uint256 inputAmount =
+            pair.swapTokenForAnyNFTs{value: inputValue}(numItemsToBuy, inputValue, address(this), false, address(0));
+
+        console.log(address(pair).balance);
+        console.log(pair.spotPrice());
     }
 }

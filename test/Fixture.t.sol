@@ -18,7 +18,7 @@ import {MockWeth} from "./mocks/MockWeth.sol";
 
 import "../src/Wheyfu.sol";
 import "../src/MintBurnToken.sol";
-import "../src/Bonding.sol";
+import "../src/OptionBonding.sol";
 import "../src/BondingNft.sol";
 import "../src/TokenUri.sol";
 
@@ -37,6 +37,12 @@ contract Fixture is Test {
     LSSVMPairFactory public sudoPairFactory;
     ICurve public xykCurve;
     LSSVMPair public pair;
+
+    // 1%
+    uint96 public fee = 1e18 / 100;
+
+    // 0.5%
+    uint256 public protocolFee = 1e18 / 200;
 
     address payable public babe;
 
@@ -57,14 +63,7 @@ contract Fixture is Test {
 
         uint256[] memory empty = new uint256[](0);
         pair = sudoPairFactory.createPairETH(
-            IERC721(address(w)),
-            xykCurve,
-            payable(0),
-            LSSVMPair.PoolType.TRADE,
-            0,
-            0,
-            0,
-            empty
+            IERC721(address(w)), xykCurve, payable(0), LSSVMPair.PoolType.TRADE, 0, fee, 0, empty
         );
 
         w.setPair(payable(address(pair)));
@@ -95,7 +94,7 @@ contract Fixture is Test {
             LSSVMPairEnumerableERC20(payable(0)),
             LSSVMPairMissingEnumerableERC20(payable(0)),
             payable(0),
-            0
+            protocolFee
         );
 
         xykCurve = ICurve(deployCode("XykCurve.json"));

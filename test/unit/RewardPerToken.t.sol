@@ -4,7 +4,6 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 import "../Fixture.t.sol";
-import {Bonding} from "../../src/Bonding.sol";
 
 contract RewardPerTokenTest is Fixture {
     using stdStorage for StdStorage;
@@ -27,8 +26,7 @@ contract RewardPerTokenTest is Fixture {
         // assert
         assertEq(
             w.rewardPerToken(),
-            (((block.timestamp - lastUpdateTime) * w.rewardRate() * 1e18) /
-                w.stakedTotalSupply()),
+            (((block.timestamp - lastUpdateTime) * w.rewardRate() * 1e18) / w.stakedTotalSupply()),
             "Should have calculated correct reward per token"
         );
     }
@@ -44,8 +42,7 @@ contract RewardPerTokenTest is Fixture {
         // assert
         assertEq(
             w.rewardPerToken(),
-            (1e18 * w.rewardRate() * w.REWARD_DURATION()) /
-                w.stakedTotalSupply(),
+            (1e18 * w.rewardRate() * w.REWARD_DURATION()) / w.stakedTotalSupply(),
             "Should calculate max rewards if timestamp is past finishAt"
         );
     }
@@ -61,11 +58,7 @@ contract RewardPerTokenTest is Fixture {
         w.unstake(tokenId);
 
         // assert
-        assertEq(
-            w.lastUpdateTime(),
-            w.finishAt() * 2,
-            "Should have set last updated at"
-        );
+        assertEq(w.lastUpdateTime(), w.finishAt() * 2, "Should have set last updated at");
 
         assertEq(
             w.rewardPerToken(),

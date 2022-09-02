@@ -29,9 +29,7 @@ contract StakeUnstakeTest is Fixture, ERC721TokenReceiver {
         uint256 totalTimeElapsed = 0;
 
         for (uint256 i = 0; i < stakes.length; i++) {
-            stakes[i].amount = uint96(
-                bound(stakes[i].amount, 1, type(uint32).max)
-            );
+            stakes[i].amount = uint96(bound(stakes[i].amount, 1, type(uint32).max));
 
             for (uint256 j = 0; j < i; j++) {
                 if (withdrawn[j]) {
@@ -39,18 +37,9 @@ contract StakeUnstakeTest is Fixture, ERC721TokenReceiver {
                 }
 
                 uint256 amount = stakes[j].amount;
-                totalEarned[j] +=
-                    (amount *
-                        ((timeElapsedSinceLastCheck * w.rewardRate() * 1e18) /
-                            totalStaked)) /
-                    1e18;
+                totalEarned[j] += (amount * ((timeElapsedSinceLastCheck * w.rewardRate() * 1e18) / totalStaked)) / 1e18;
 
-                assertApproxEqAbs(
-                    w.earned(j + 1),
-                    totalEarned[j],
-                    10,
-                    "Should have accrued rewards correctly"
-                );
+                assertApproxEqAbs(w.earned(j + 1), totalEarned[j], 10, "Should have accrued rewards correctly");
             }
 
             for (uint256 k = 0; k < i; k++) {
@@ -80,11 +69,7 @@ contract StakeUnstakeTest is Fixture, ERC721TokenReceiver {
 
             vm.stopPrank();
 
-            assertEq(
-                w.stakedTotalSupply(),
-                totalStaked,
-                "Should have increased total staked"
-            );
+            assertEq(w.stakedTotalSupply(), totalStaked, "Should have increased total staked");
         }
 
         uint256 total = 0;

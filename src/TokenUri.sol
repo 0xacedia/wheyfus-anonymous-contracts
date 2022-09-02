@@ -7,19 +7,12 @@ import "base64/base64.sol";
 import "hot-chain-svg/SVG.sol";
 
 contract TokenUri {
-    string[] public colors = [
-        "#CDB4DB",
-        "#FFC8DD",
-        "#FFAFCC",
-        "#BDE0FE",
-        "#A2D2FF"
-    ];
+    string[] public colors = ["#CDB4DB", "#FFC8DD", "#FFAFCC", "#BDE0FE", "#A2D2FF"];
 
     string[] public texts = [
         "cant touch this!",
         "uwuwuuwuwuwuuwuw",
-        "dyel?"
-        "rip zyzz huhuhhe",
+        "dyel?" "rip zyzz huhuhhe",
         "wow ur muscles are so big!",
         "lookin juicy",
         "mmmmm",
@@ -66,11 +59,7 @@ contract TokenUri {
         wheyfu = Wheyfu(_wheyfu);
     }
 
-    function addressToString(address account)
-        public
-        pure
-        returns (string memory)
-    {
+    function addressToString(address account) public pure returns (string memory) {
         bytes memory data = abi.encodePacked(account);
 
         bytes memory alphabet = "0123456789abcdef";
@@ -93,84 +82,41 @@ contract TokenUri {
         bytes32 textSeed = keccak256(abi.encode(tokenId, 33333));
         string memory text = texts[uint256(textSeed) % texts.length];
 
-        return
-            string.concat(
-                /* solhint-disable quotes */
-                string.concat(
-                    '<svg xmlns="http://www.w3.org/2000/svg" width="350" height="350" style="background:',
-                    color,
-                    '">'
-                ),
-                svg.text(
-                    string.concat(
-                        svg.prop("x", "10"),
-                        svg.prop("y", "20"),
-                        svg.prop("font-size", "14"),
-                        svg.prop("fill", "white")
-                    ),
-                    text
-                ),
-                svg.text(
-                    string.concat(
-                        svg.prop("x", "10"),
-                        svg.prop("y", "40"),
-                        svg.prop("font-size", "14"),
-                        svg.prop("fill", "white")
-                    ),
-                    "I'm not yet revealed :3"
-                ),
-                svg.text(
-                    string.concat(
-                        svg.prop("x", "10"),
-                        svg.prop("y", "60"),
-                        svg.prop("font-size", "14"),
-                        svg.prop("fill", "white")
-                    ),
-                    string.concat(
-                        "my wholly unique identifier is #",
-                        Strings.toString(tokenId)
-                    )
-                ),
-                "</svg>"
-                /* solhint-enable quotes */
-            );
+        return string.concat(
+            /* solhint-disable quotes */
+            string.concat('<svg xmlns="http://www.w3.org/2000/svg" width="350" height="350" style="background:', color, '">'),
+            svg.text(
+                string.concat(svg.prop("x", "10"), svg.prop("y", "20"), svg.prop("font-size", "14"), svg.prop("fill", "white")),
+                text
+            ),
+            svg.text(
+                string.concat(svg.prop("x", "10"), svg.prop("y", "40"), svg.prop("font-size", "14"), svg.prop("fill", "white")),
+                "I'm not yet revealed :3"
+            ),
+            svg.text(
+                string.concat(svg.prop("x", "10"), svg.prop("y", "60"), svg.prop("font-size", "14"), svg.prop("fill", "white")),
+                string.concat("my wholly unique identifier is #", Strings.toString(tokenId))
+            ),
+            "</svg>"
+        );
+        /* solhint-enable quotes */
     }
 
-    function renderCallOptionSvg(uint256 tokenId)
-        public
-        view
-        returns (string memory)
-    {
-        return
-            string.concat(
-                /* solhint-disable quotes */
-                string.concat(
-                    '<svg xmlns="http://www.w3.org/2000/svg" width="350" height="350" style="background:',
-                    "pink",
-                    '">'
-                ),
-                svg.text(
-                    string.concat(
-                        svg.prop("x", "10"),
-                        svg.prop("y", "20"),
-                        svg.prop("font-size", "16"),
-                        svg.prop("fill", "white")
-                    ),
-                    string.concat(
-                        "Fresh: Ticket for ",
-                        Strings.toString(type(uint256).max - tokenId),
-                        " wheyfus"
-                    )
-                ),
-                "</svg>"
-                /* solhint-enable quotes */
-            );
+    function renderCallOptionSvg(uint256 tokenId) public view returns (string memory) {
+        return string.concat(
+            /* solhint-disable quotes */
+            string.concat('<svg xmlns="http://www.w3.org/2000/svg" width="350" height="350" style="background:', "pink", '">'),
+            svg.text(
+                string.concat(svg.prop("x", "10"), svg.prop("y", "20"), svg.prop("font-size", "16"), svg.prop("fill", "white")),
+                string.concat("Fresh: Ticket for ", Strings.toString(type(uint256).max - tokenId), " wheyfus")
+            ),
+            "</svg>"
+        );
+        /* solhint-enable quotes */
     }
 
     function renderJson(uint256 tokenId) public view returns (string memory) {
-        string memory svgStr = tokenId <= wheyfu.MAX_SUPPLY()
-            ? renderSvg(tokenId)
-            : renderCallOptionSvg(tokenId);
+        string memory svgStr = tokenId <= wheyfu.MAX_SUPPLY() ? renderSvg(tokenId) : renderCallOptionSvg(tokenId);
 
         string memory json = string.concat(
             /* solhint-disable quotes */
@@ -182,8 +128,8 @@ contract TokenUri {
             Base64.encode(bytes(svgStr)),
             '","attributes": [',
             "]}"
-            /* solhint-enable quotes */
         );
+        /* solhint-enable quotes */
 
         return json;
     }
@@ -191,10 +137,6 @@ contract TokenUri {
     function tokenURI(uint256 id) public view returns (string memory) {
         string memory jsonStr = renderJson(id);
 
-        return
-            string.concat(
-                "data:application/json;base64,",
-                Base64.encode(bytes(jsonStr))
-            );
+        return string.concat("data:application/json;base64,", Base64.encode(bytes(jsonStr)));
     }
 }

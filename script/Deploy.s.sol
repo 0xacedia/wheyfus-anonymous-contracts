@@ -39,20 +39,11 @@ contract DeployScript is Script {
         TokenUri tokenUri = new TokenUri(payable(address(wheyfu)));
 
         // create the wheyfu:eth sudoswap pair
-        LSSVMPairFactory sudoFactory = LSSVMPairFactory(
-            payable(vm.envAddress("SUDO_FACTORY_ADDRESS"))
-        );
+        LSSVMPairFactory sudoFactory = LSSVMPairFactory(payable(vm.envAddress("SUDO_FACTORY_ADDRESS")));
         ICurve xykCurve = ICurve(vm.envAddress("SUDO_XYK_CURVE_ADDRESS"));
         uint256[] memory empty = new uint256[](0);
         LSSVMPair pair = sudoFactory.createPairETH(
-            IERC721(address(wheyfu)),
-            xykCurve,
-            payable(0),
-            LSSVMPair.PoolType.TRADE,
-            0,
-            0,
-            0,
-            empty
+            IERC721(address(wheyfu)), xykCurve, payable(0), LSSVMPair.PoolType.TRADE, 0, 0, 0, empty
         );
         console.log("pair:");
         console.log(address(pair));
@@ -91,11 +82,6 @@ contract DeployScript is Script {
         tokenIds[2] = 3;
         tokenIds[3] = 4;
         tokenIds[4] = 5;
-        wheyfu.addLiquidityAndStake{value: 0.03 ether}(
-            tokenIds,
-            0,
-            type(uint256).max,
-            1
-        );
+        wheyfu.addLiquidityAndStake{value: 0.03 ether}(tokenIds, 0, type(uint256).max, 1);
     }
 }

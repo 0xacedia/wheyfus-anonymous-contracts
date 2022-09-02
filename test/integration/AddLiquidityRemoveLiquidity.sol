@@ -25,10 +25,7 @@ contract AddLiquidityRemoveLiquidityTest is Fixture, ERC721TokenReceiver {
         }
 
         for (uint256 i = 0; i < depositsNumNfts.length; i++) {
-            if (
-                w.totalSupply() + depositsNumNfts[i] >=
-                w.mintWhitelist(address(this))
-            ) {
+            if (w.totalSupply() + depositsNumNfts[i] >= w.mintWhitelist(address(this))) {
                 vm.stopPrank();
                 break;
             }
@@ -43,11 +40,7 @@ contract AddLiquidityRemoveLiquidityTest is Fixture, ERC721TokenReceiver {
             uint256 mintAmount = depositsNumNfts[i];
             w.mint(mintAmount);
 
-            for (
-                uint256 i = totalSupplyBefore;
-                i < totalSupplyBefore + mintAmount;
-                i++
-            ) {
+            for (uint256 i = totalSupplyBefore; i < totalSupplyBefore + mintAmount; i++) {
                 tokenIds.push(i + 1);
             }
 
@@ -77,33 +70,17 @@ contract AddLiquidityRemoveLiquidityTest is Fixture, ERC721TokenReceiver {
             }
             vm.stopPrank();
 
-            assertEq(
-                person.balance,
-                deposits[i],
-                "Should have withdrawn liquidity"
-            );
+            assertEq(person.balance, deposits[i], "Should have withdrawn liquidity");
 
             for (uint256 k = 0; k < tokenIds.length; k++) {
-                assertEq(
-                    w.ownerOf(tokenIds[k]),
-                    person,
-                    "Should have withdrawn NFT"
-                );
+                assertEq(w.ownerOf(tokenIds[k]), person, "Should have withdrawn NFT");
             }
         }
 
         assertEq(lp.totalSupply(), 0, "Should have burned all LP tokens");
         assertEq(w.tokenReserves(), 0, "Should have updated ETH reserves");
         assertEq(w.nftReserves(), 0, "Should have updated NFT reserves");
-        assertEq(
-            address(w.pair()).balance,
-            0,
-            "Should have withdrawn all ETH liq"
-        );
-        assertEq(
-            w.balanceOf(address(w.pair())),
-            0,
-            "Should have withdrawn all NFT liq"
-        );
+        assertEq(address(w.pair()).balance, 0, "Should have withdrawn all ETH liq");
+        assertEq(w.balanceOf(address(w.pair())), 0, "Should have withdrawn all NFT liq");
     }
 }

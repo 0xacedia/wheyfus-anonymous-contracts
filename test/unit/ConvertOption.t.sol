@@ -20,11 +20,7 @@ contract ConvertOptionTest is Fixture {
         w.convertToOption(9, 1);
 
         // assert
-        assertEq(
-            co.balanceOf(address(this)),
-            1e18,
-            "Should have burned call options"
-        );
+        assertEq(co.balanceOf(address(this)), 1e18, "Should have burned call options");
     }
 
     function testItTransfersCallOption() public {
@@ -32,20 +28,13 @@ contract ConvertOptionTest is Fixture {
         deal(address(co), address(this), 10e18, true);
 
         // act
-        (uint256 longPosition, PuttyV2.Order memory shortOrder) = w
-            .convertToOption(10, 1);
+        (uint256 longPosition, PuttyV2.Order memory shortOrder) = w.convertToOption(10, 1);
 
         // assert
-        assertEq(
-            p.ownerOf(longPosition),
-            address(this),
-            "Should have sent long option to convertor"
-        );
+        assertEq(p.ownerOf(longPosition), address(this), "Should have sent long option to convertor");
 
         assertEq(
-            p.ownerOf(uint256(p.hashOrder(shortOrder))),
-            address(w),
-            "Should have sent short option to wheyfu contract"
+            p.ownerOf(uint256(p.hashOrder(shortOrder))), address(w), "Should have sent short option to wheyfu contract"
         );
     }
 
@@ -58,18 +47,10 @@ contract ConvertOptionTest is Fixture {
         (, PuttyV2.Order memory shortOrder) = w.convertToOption(10, nonce);
 
         // assert
-        assertEq(
-            shortOrder.maker,
-            address(w),
-            "Maker should be wheyfu contract"
-        );
+        assertEq(shortOrder.maker, address(w), "Maker should be wheyfu contract");
         assertEq(shortOrder.isCall, true, "Should be call option");
         assertEq(shortOrder.isLong, false, "Should be short order");
-        assertEq(
-            shortOrder.baseAsset,
-            address(weth),
-            "Base asset should be weth"
-        );
+        assertEq(shortOrder.baseAsset, address(weth), "Base asset should be weth");
         assertEq(shortOrder.strike, 0.1 ether * 10, "Strike should be 1 ether");
         assertEq(shortOrder.premium, 0, "Premium should be 0");
         assertEq(
@@ -79,15 +60,9 @@ contract ConvertOptionTest is Fixture {
         );
         assertEq(shortOrder.nonce, nonce, "Should have set nonce");
         assertEq(shortOrder.erc721Assets.length, 1, "Should have set 1 asset");
+        assertEq(shortOrder.erc721Assets[0].token, address(w), "Should have set token to be wheyfu");
         assertEq(
-            shortOrder.erc721Assets[0].token,
-            address(w),
-            "Should have set token to be wheyfu"
-        );
-        assertEq(
-            type(uint256).max - shortOrder.erc721Assets[0].tokenId,
-            10,
-            "Should have set tokenId to max - num assets"
+            type(uint256).max - shortOrder.erc721Assets[0].tokenId, 10, "Should have set tokenId to max - num assets"
         );
     }
 

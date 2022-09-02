@@ -29,11 +29,7 @@ contract AddLiquidityTest is Fixture {
         w.addLiquidity{value: deposit}(tokenIds, 0, 0);
 
         // assert
-        assertEq(
-            address(pair).balance,
-            deposit,
-            "Should have transferred ETH to sudo"
-        );
+        assertEq(address(pair).balance, deposit, "Should have transferred ETH to sudo");
     }
 
     function testItEmitsAddLiquidityEvent() public {
@@ -65,11 +61,7 @@ contract AddLiquidityTest is Fixture {
 
         // assert
         assertEq(pair.spotPrice(), deposit, "Should have updated ETH reserves");
-        assertEq(
-            pair.delta(),
-            tokenIds.length,
-            "Should have updated nft reserves"
-        );
+        assertEq(pair.delta(), tokenIds.length, "Should have updated nft reserves");
     }
 
     function testItMintsInitialDepositLPTokens() public {
@@ -80,11 +72,7 @@ contract AddLiquidityTest is Fixture {
         w.addLiquidity{value: deposit}(tokenIds, 0, 0);
 
         // assert
-        assertEq(
-            lp.balanceOf(address(this)),
-            deposit * tokenIds.length,
-            "Should have minted initial LP shares"
-        );
+        assertEq(lp.balanceOf(address(this)), deposit * tokenIds.length, "Should have minted initial LP shares");
     }
 
     function testItCannotMintIfSlippageIsTooHigh() public {
@@ -94,18 +82,10 @@ contract AddLiquidityTest is Fixture {
 
         // act
         vm.expectRevert("Price slippage");
-        w.addLiquidity{value: 1 ether}(
-            tokenIds,
-            0,
-            deposit / tokenIds.length - 1
-        );
+        w.addLiquidity{value: 1 ether}(tokenIds, 0, deposit / tokenIds.length - 1);
 
         vm.expectRevert("Price slippage");
-        w.addLiquidity{value: 1 ether}(
-            tokenIds,
-            deposit / tokenIds.length + 1,
-            deposit / tokenIds.length
-        );
+        w.addLiquidity{value: 1 ether}(tokenIds, deposit / tokenIds.length + 1, deposit / tokenIds.length);
     }
 
     function testItMintsCorrectAmountOfLPTokens() public {
@@ -122,11 +102,7 @@ contract AddLiquidityTest is Fixture {
         delete tokenIds;
         w.mint(mintAmount);
 
-        for (
-            uint256 i = totalSupplyBefore;
-            i < totalSupplyBefore + mintAmount;
-            i++
-        ) {
+        for (uint256 i = totalSupplyBefore; i < totalSupplyBefore + mintAmount; i++) {
             tokenIds.push(i + 1);
         }
 
@@ -138,10 +114,6 @@ contract AddLiquidityTest is Fixture {
         vm.stopPrank();
 
         // assert
-        assertEq(
-            lp.balanceOf(babe) / lp.balanceOf(address(this)),
-            multiplier,
-            "Should have minted LP shares"
-        );
+        assertEq(lp.balanceOf(babe) / lp.balanceOf(address(this)), multiplier, "Should have minted LP shares");
     }
 }

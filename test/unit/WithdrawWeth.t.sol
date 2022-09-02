@@ -17,10 +17,7 @@ contract WithdrawWethTest is Fixture, ERC721TokenReceiver {
         (, PuttyV2.Order memory shortOrder) = w.convertToOption(10, 1);
         PuttyV2.Order[] memory orders = new PuttyV2.Order[](1);
         orders[0] = shortOrder;
-        PuttyV2.Order memory longOrder = abi.decode(
-            abi.encode(shortOrder),
-            (PuttyV2.Order)
-        );
+        PuttyV2.Order memory longOrder = abi.decode(abi.encode(shortOrder), (PuttyV2.Order));
         longOrder.isLong = true;
         uint256[] memory empty = new uint256[](0);
 
@@ -31,11 +28,7 @@ contract WithdrawWethTest is Fixture, ERC721TokenReceiver {
         w.withdrawWeth(orders, address(babe));
 
         // assert
-        assertEq(
-            weth.balanceOf(babe),
-            10 * w.STRIKE(),
-            "Should have transferred weth to babe"
-        );
+        assertEq(weth.balanceOf(babe), 10 * w.STRIKE(), "Should have transferred weth to babe");
     }
 
     function testItCannotCallIfNotOwner() public {

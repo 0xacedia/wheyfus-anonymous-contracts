@@ -21,10 +21,7 @@ contract UnstakeTest is Fixture {
 
         // assert
         assertApproxEqAbs(
-            co.balanceOf(address(this)),
-            w.rewardRate() * 30 days,
-            2,
-            "Should have withdrawn call option tokens"
+            co.balanceOf(address(this)), w.rewardRate() * 30 days, 2, "Should have withdrawn call option tokens"
         );
     }
 
@@ -34,11 +31,7 @@ contract UnstakeTest is Fixture {
         w.unstake(tokenId);
 
         // assert
-        assertEq(
-            lp.balanceOf(address(this)),
-            amount,
-            "Should have withdrawn lp tokens"
-        );
+        assertEq(lp.balanceOf(address(this)), amount, "Should have withdrawn lp tokens");
     }
 
     function testItDecreasesStakedTotalSupply() public {
@@ -47,11 +40,7 @@ contract UnstakeTest is Fixture {
         w.unstake(tokenId);
 
         // assert
-        assertEq(
-            w.stakedTotalSupply(),
-            0,
-            "Should have decreased total supply"
-        );
+        assertEq(w.stakedTotalSupply(), 0, "Should have decreased total supply");
     }
 
     function testItUpdatesLastUpdateTime() public {
@@ -60,30 +49,20 @@ contract UnstakeTest is Fixture {
         w.unstake(tokenId);
 
         // assert
-        assertEq(
-            w.lastUpdateTime(),
-            block.timestamp,
-            "Should have updated last update time"
-        );
+        assertEq(w.lastUpdateTime(), block.timestamp, "Should have updated last update time");
     }
 
     function testItUpdatesRewardPerTokenStored() public {
         // arrange
         uint256 duration = 30 days;
-        uint256 expectedRewardPerTokenStored = ((w.rewardRate() *
-            duration *
-            1e18) / w.stakedTotalSupply());
+        uint256 expectedRewardPerTokenStored = ((w.rewardRate() * duration * 1e18) / w.stakedTotalSupply());
 
         // act
         skip(duration);
         w.unstake(tokenId);
 
         // assert
-        assertEq(
-            w.rewardPerTokenStored(),
-            expectedRewardPerTokenStored,
-            "Should have updated last update time"
-        );
+        assertEq(w.rewardPerTokenStored(), expectedRewardPerTokenStored, "Should have updated last update time");
     }
 
     function testItBurnsBondToken() public {
@@ -124,16 +103,11 @@ contract UnstakeTest is Fixture {
         vm.stopPrank();
 
         // assert
-        uint256 virtualAmount = ((uint256(w.bonds(tokenId).depositAmount) *
-            1.5e18) / 1e18);
-        uint256 expectedReward = (w.rewardRate() * 112 days * virtualAmount) /
-            totalSupply;
+        uint256 virtualAmount = ((uint256(w.bonds(tokenId).depositAmount) * 1.5e18) / 1e18);
+        uint256 expectedReward = (w.rewardRate() * 112 days * virtualAmount) / totalSupply;
 
         assertApproxEqAbs(
-            co.balanceOf(babe),
-            expectedReward,
-            2,
-            "Should have withdrawn correct amount of call option tokens"
+            co.balanceOf(babe), expectedReward, 2, "Should have withdrawn correct amount of call option tokens"
         );
     }
 }

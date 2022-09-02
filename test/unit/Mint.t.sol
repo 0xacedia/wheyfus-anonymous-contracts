@@ -26,9 +26,7 @@ contract MintTest is Fixture {
 
         // assert
         assertEq(
-            w.mintWhitelist(address(this)),
-            mintWhitelistAmountBefore - 10,
-            "Should have decremented mint whitelist"
+            w.mintWhitelist(address(this)), mintWhitelistAmountBefore - 10, "Should have decremented mint whitelist"
         );
     }
 
@@ -66,11 +64,7 @@ contract MintTest is Fixture {
         w.whitelistMinter(babe, 10);
 
         // assert
-        assertEq(
-            w.mintWhitelist(babe),
-            10,
-            "Should have set babe whitelist amount"
-        );
+        assertEq(w.mintWhitelist(babe), 10, "Should have set babe whitelist amount");
     }
 
     function testItIncrementsWhitelistedSupply() public {
@@ -91,10 +85,7 @@ contract MintTest is Fixture {
         // assert
         assertEq(
             w.whitelistedSupply(),
-            whitelistedSupplyBefore +
-                bobFinalAmount +
-                babeFinalAmount +
-                beefFinalAmount,
+            whitelistedSupplyBefore + bobFinalAmount + babeFinalAmount + beefFinalAmount,
             "Should have set whitelisted supply"
         );
     }

@@ -7,11 +7,7 @@ import {ERC721TokenReceiver} from "solmate/tokens/ERC721.sol";
 import "../Fixture.t.sol";
 
 contract RemoveLiquidityTest is Fixture, ERC721TokenReceiver {
-    event RemoveLiquidity(
-        uint256 tokenAmount,
-        uint256 nftAmount,
-        uint256 shares
-    );
+    event RemoveLiquidity(uint256 tokenAmount, uint256 nftAmount, uint256 shares);
 
     using stdStorage for StdStorage;
 
@@ -43,16 +39,8 @@ contract RemoveLiquidityTest is Fixture, ERC721TokenReceiver {
         w.removeLiquidity(tokenIds, 0, type(uint256).max);
 
         // assert
-        assertEq(
-            sudoBeforeBalance - address(w.pair()).balance,
-            deposit,
-            "Should have withdrawn ETH from sudo"
-        );
-        assertEq(
-            address(this).balance - thisBeforeBalance,
-            deposit,
-            "Should have sent ETH to withdrawer"
-        );
+        assertEq(sudoBeforeBalance - address(w.pair()).balance, deposit, "Should have withdrawn ETH from sudo");
+        assertEq(address(this).balance - thisBeforeBalance, deposit, "Should have sent ETH to withdrawer");
     }
 
     function testItEmitsRemoveLiquidityEvent() public {
@@ -61,11 +49,7 @@ contract RemoveLiquidityTest is Fixture, ERC721TokenReceiver {
 
         // act
         vm.expectEmit(true, true, true, true);
-        emit RemoveLiquidity(
-            deposit,
-            tokenIds.length,
-            deposit * tokenIds.length
-        );
+        emit RemoveLiquidity(deposit, tokenIds.length, deposit * tokenIds.length);
         w.removeLiquidity(tokenIds, 0, type(uint256).max);
     }
 
@@ -75,11 +59,7 @@ contract RemoveLiquidityTest is Fixture, ERC721TokenReceiver {
 
         // assert
         for (uint256 i = 0; i < mintAmount; i++) {
-            assertEq(
-                w.ownerOf(tokenIds[i]),
-                address(this),
-                "Should have withdrawn NFT"
-            );
+            assertEq(w.ownerOf(tokenIds[i]), address(this), "Should have withdrawn NFT");
         }
     }
 
@@ -94,15 +74,9 @@ contract RemoveLiquidityTest is Fixture, ERC721TokenReceiver {
 
         // assert
         assertEq(
-            pair.spotPrice(),
-            (deposit * tokenAmountToRemove) / tokenAmountBefore,
-            "Should have updated ETH reserves"
+            pair.spotPrice(), (deposit * tokenAmountToRemove) / tokenAmountBefore, "Should have updated ETH reserves"
         );
-        assertEq(
-            pair.delta(),
-            tokenIds.length,
-            "Should have updated nft reserves"
-        );
+        assertEq(pair.delta(), tokenIds.length, "Should have updated nft reserves");
     }
 
     function testItBurnsInitialDepositLPTokens() public {
@@ -128,18 +102,10 @@ contract RemoveLiquidityTest is Fixture, ERC721TokenReceiver {
     function testItCannotBurnIfSlippageIsTooHigh() public {
         // act
         vm.expectRevert("Price slippage");
-        w.removeLiquidity(
-            tokenIds,
-            deposit / tokenIds.length,
-            deposit / tokenIds.length - 1
-        );
+        w.removeLiquidity(tokenIds, deposit / tokenIds.length, deposit / tokenIds.length - 1);
 
         vm.expectRevert("Price slippage");
-        w.removeLiquidity(
-            tokenIds,
-            deposit / tokenIds.length + 1,
-            deposit / tokenIds.length
-        );
+        w.removeLiquidity(tokenIds, deposit / tokenIds.length + 1, deposit / tokenIds.length);
     }
 
     function testItRemovesCorrectAmountOfLiquidity() public {
@@ -154,11 +120,7 @@ contract RemoveLiquidityTest is Fixture, ERC721TokenReceiver {
         uint256 totalSupplyBefore = w.totalSupply();
         w.mint(mintAmount);
 
-        for (
-            uint256 i = totalSupplyBefore;
-            i < totalSupplyBefore + mintAmount;
-            i++
-        ) {
+        for (uint256 i = totalSupplyBefore; i < totalSupplyBefore + mintAmount; i++) {
             tokenIds.push(i + 1);
         }
 
@@ -174,19 +136,12 @@ contract RemoveLiquidityTest is Fixture, ERC721TokenReceiver {
 
         // assert
         assertEq(babe.balance, deposit, "Should have withdrawn ETH");
-        assertEq(
-            w.balanceOf(babe),
-            tokenIds.length,
-            "Should have withdrawn NFTs"
-        );
+        assertEq(w.balanceOf(babe), tokenIds.length, "Should have withdrawn NFTs");
         for (uint256 i = 0; i < tokenIds.length; i++) {
             assertEq(w.ownerOf(tokenIds[i]), babe, "Should have withdrawn NFT");
         }
         assertEq(
-            lp.totalSupply(),
-            totalLPSupplyBefore -
-                ((totalLPSupplyBefore * tokenIds.length) /
-                    pairTokenBalanceBefore)
+            lp.totalSupply(), totalLPSupplyBefore - ((totalLPSupplyBefore * tokenIds.length) / pairTokenBalanceBefore)
         );
     }
 }
