@@ -10,7 +10,7 @@ import {ICurve} from "lssvm/bonding-curves/ICurve.sol";
 
 import {Wheyfu} from "../src/Wheyfu.sol";
 import {TokenUri} from "../src/TokenUri.sol";
-import {MintBurnToken} from "../src/MintBurnToken.sol";
+import {MintBurnToken} from "../src/lib/MintBurnToken.sol";
 
 contract DeployScript is Script {
     function run() public {
@@ -35,7 +35,7 @@ contract DeployScript is Script {
         console.log("wheyfu:");
         console.log(address(wheyfu));
         console.log("bonding nft:");
-        console.log(address(wheyfu.bondingNft()));
+        console.log(address(wheyfu.optionBondingNft()));
         TokenUri tokenUri = new TokenUri(payable(address(wheyfu)));
 
         // create the wheyfu:eth sudoswap pair
@@ -82,6 +82,6 @@ contract DeployScript is Script {
         tokenIds[2] = 3;
         tokenIds[3] = 4;
         tokenIds[4] = 5;
-        wheyfu.addLiquidityAndStake{value: 0.03 ether}(tokenIds, 0, type(uint256).max, 1);
+        wheyfu.addLiquidityAndOptionStake{value: 0.03 ether}(tokenIds, 0, type(uint256).max, 1);
     }
 }

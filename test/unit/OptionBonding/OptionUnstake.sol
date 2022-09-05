@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import "../Fixture.t.sol";
+import "../../Fixture.t.sol";
 
 contract OptionUnstakeTest is Fixture {
     uint96 public amount;
@@ -11,13 +11,13 @@ contract OptionUnstakeTest is Fixture {
     function setUp() public {
         amount = 1e18;
         deal(address(lp), address(this), amount, true);
-        tokenId = w.stake(amount, 1);
+        tokenId = w.optionStake(amount, 1);
     }
 
     function testItTransfersCallOptionTokens() public {
         // act
         skip(30 days);
-        w.unstake(tokenId);
+        w.optionUnstake(tokenId);
 
         // assert
         assertApproxEqAbs(
@@ -28,7 +28,7 @@ contract OptionUnstakeTest is Fixture {
     function testItTransfersLpTokens() public {
         // act
         skip(30 days);
-        w.unstake(tokenId);
+        w.optionUnstake(tokenId);
 
         // assert
         assertEq(lp.balanceOf(address(this)), amount, "Should have withdrawn lp tokens");
@@ -37,16 +37,16 @@ contract OptionUnstakeTest is Fixture {
     function testItDecreasesStakedTotalSupply() public {
         // act
         skip(30 days);
-        w.unstake(tokenId);
+        w.optionUnstake(tokenId);
 
         // assert
-        assertEq(w.stakedTotalSupply(), 0, "Should have decreased total supply");
+        assertEq(w.optionStakedTotalSupply(), 0, "Should have decreased total supply");
     }
 
     function testItUpdatesLastUpdateTime() public {
         // act
         skip(30 days);
-        w.unstake(tokenId);
+        w.optionUnstake(tokenId);
 
         // assert
         assertEq(w.lastUpdateTime(), block.timestamp, "Should have updated last update time");
@@ -55,20 +55,20 @@ contract OptionUnstakeTest is Fixture {
     function testItUpdatesRewardPerTokenStored() public {
         // arrange
         uint256 duration = 30 days;
-        uint256 expectedRewardPerTokenStored = ((w.rewardRate() * duration * 1e18) / w.stakedTotalSupply());
+        uint256 expectedRewardPerTokenStored = ((w.rewardRate() * duration * 1e18) / w.optionStakedTotalSupply());
 
         // act
         skip(duration);
-        w.unstake(tokenId);
+        w.optionUnstake(tokenId);
 
         // assert
-        assertEq(w.rewardPerTokenStored(), expectedRewardPerTokenStored, "Should have updated last update time");
+        assertEq(w.optionRewardPerTokenStored(), expectedRewardPerTokenStored, "Should have updated last update time");
     }
 
     function testItBurnsBondToken() public {
         // act
         skip(30 days);
-        w.unstake(tokenId);
+        w.optionUnstake(tokenId);
 
         // assert
         vm.expectRevert("NOT_MINTED");
@@ -79,14 +79,14 @@ contract OptionUnstakeTest is Fixture {
         // act
         skip(7 days - 1);
         vm.expectRevert("Bond not matured");
-        w.unstake(tokenId);
+        w.optionUnstake(tokenId);
     }
 
     function testItCannotWithdrawBondYouDontOwn() public {
         // act
         vm.prank(babe);
         vm.expectRevert("Not owner");
-        w.unstake(tokenId);
+        w.optionUnstake(tokenId);
     }
 
     function testItTransfersCorrectAmountOfCallOptionTokens() public {
@@ -95,11 +95,11 @@ contract OptionUnstakeTest is Fixture {
         skip(1 days);
 
         deal(address(lp), babe, amount, true);
-        tokenId = w.stake(amount, 3);
+        tokenId = w.optionStake(amount, 3);
 
-        uint256 totalSupply = w.stakedTotalSupply();
+        uint256 totalSupply = w.optionStakedTotalSupply();
         skip(112 days);
-        w.unstake(tokenId);
+        w.optionUnstake(tokenId);
         vm.stopPrank();
 
         // assert

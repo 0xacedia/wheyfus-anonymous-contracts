@@ -4,8 +4,11 @@ pragma solidity 0.8.16;
 import {ERC721} from "solmate/tokens/ERC721.sol";
 import {Owned} from "solmate/auth/Owned.sol";
 
+/**
+ * @dev Removes all the balanceOf parts for gas savings.
+ */
 contract BondingNft is ERC721, Owned {
-    constructor() ERC721("Wheyfu LP Option Bonds", "WLOB") Owned(msg.sender) {}
+    constructor(string memory name, string memory symbol) ERC721(name, symbol) Owned(msg.sender) {}
 
     function mint(address to, uint256 id) public onlyOwner {
         _mint(to, id);
@@ -54,7 +57,7 @@ contract BondingNft is ERC721, Owned {
         return type(uint256).max - 1;
     }
 
-    function tokenURI(uint256 id) public view virtual override returns (string memory) {
-        return "1";
+    function tokenURI(uint256) public view virtual override returns (string memory) {
+        return "";
     }
 }

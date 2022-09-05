@@ -2,17 +2,15 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import "../Fixture.t.sol";
+import "../../Fixture.t.sol";
 
 contract AdminTest is Fixture {
     function setUp() public {}
 
-    function testItSetsPair() public {
+    function testItCannotSetPairIfAlreadySet() public {
         // act
+        vm.expectRevert("Pair already set");
         w.setPair(payable(address(0xdead)));
-
-        // assert
-        assertEq(address(w.pair()), address(0xdead), "Should have set pair");
     }
 
     function testItCannotSetPairIfNotAdmin() public {
@@ -42,5 +40,20 @@ contract AdminTest is Fixture {
         vm.prank(babe);
         vm.expectRevert("UNAUTHORIZED");
         w.whitelistMinter(babe, 1);
+    }
+
+    function testItSetsTokenUri() public {
+        // act
+        w.setTokenUri(babe);
+
+        // assert
+        assertEq(address(w.tokenUri()), babe, "Should have set token uri");
+    }
+
+    function testItCannotSetTokenUriIfNotAdmin() public {
+        // act
+        vm.prank(babe);
+        vm.expectRevert("UNAUTHORIZED");
+        w.setTokenUri(babe);
     }
 }

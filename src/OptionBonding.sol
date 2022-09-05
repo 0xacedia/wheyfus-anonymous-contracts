@@ -8,9 +8,23 @@ import {ERC721} from "solmate/tokens/ERC721.sol";
 import {Owned} from "solmate/auth/Owned.sol";
 import {PuttyV2} from "putty-v2/PuttyV2.sol";
 
-import {MintBurnToken} from "./MintBurnToken.sol";
-import {BondingNft} from "./BondingNft.sol";
+import {MintBurnToken} from "./lib/MintBurnToken.sol";
+import {BondingNft} from "./lib/BondingNft.sol";
 
+/**
+ * @notice Option bonding stufffff.
+ *
+ * LP's stake their LP tokens for preset bond durations. In return they receive
+ * call option token rewards which are distributed linearly over time. Option token
+ * rewards can be claimed after the bond matures. The longer the bond duration, the
+ * higher the yield boost.
+ *
+ * The option ERC20 tokens can be converted for actual call option contracts on putty via the
+ * convertToOption() method. Each call option has a strike of 0.1 ether per NFT and expires
+ * in 5 years from now. When the option is exercised, the wheyfus are minted to your wallet.
+ *
+ * @author 0xacedia
+ */
 contract OptionBonding is IERC1271, Owned {
     /**
      * @notice Bond details.
@@ -19,9 +33,9 @@ contract OptionBonding is IERC1271, Owned {
      * @param depositTimestamp The unix timestamp of the deposit.
      * @param termIndex The index into the terms array for the bond term.
      */
-    struct Bond {
+    struct OptionBond {
         uint256 rewardPerTokenCheckpoint;
-        uint96 depositAmount;
+        uint128 depositAmount;
         uint32 depositTimestamp;
         uint8 termIndex;
     }
@@ -32,33 +46,18 @@ contract OptionBonding is IERC1271, Owned {
     /// @notice The yield boost options for corresponding to each term.
     uint256[] public termBoosters = [1e18, 1.1e18, 1.2e18, 1.5e18, 2e18, 3e18];
 
-    /// @notice The ERC20 token that can be used to claim call options.
-    MintBurnToken public immutable callOptionToken;
-
-    /// @notice The ERC20 token that represents lp shares in the sudoswap pool.
-    MintBurnToken public immutable lpToken;
-
-    /// @notice The nft contract that represents bonds.
-    BondingNft public immutable bondingNft;
-
-    /// @notice The Putty contract.
-    PuttyV2 public immutable putty;
-
-    /// @notice The Wrapped Ethereum contract.
-    IERC20 public immutable weth;
-
     /// @notice The total amount of call option tokens to give out in bond rewards.
     uint256 public constant TOTAL_REWARDS = 9000 * 1e18;
 
     /// @notice The duration over which bond rewards are distributed.
     uint256 public constant REWARD_DURATION = 900 days;
 
-    /// @notice The strike price for each call option.
-    uint256 public constant STRIKE = 0.1 ether;
-
     /// @notice The emission rate for call option tokens.
     /// @dev Calculated by taking the total rewards and dividing it by the reward duration.
     uint256 public immutable rewardRate = TOTAL_REWARDS / REWARD_DURATION;
+
+    /// @notice The strike price for each call option.
+    uint256 public constant STRIKE = 0.1 ether;
 
     /// @notice The expiration date of each option.
     /// @dev The expiration date is set to be 1825 days from the deployment date (approx. 5 years).
@@ -72,137 +71,154 @@ contract OptionBonding is IERC1271, Owned {
     uint256 public immutable startAt = block.timestamp;
 
     /// @notice The total amount of bonds in existence.
-    uint32 public totalBondSupply;
+    uint32 public optionBondTotalSupply;
+
+    /// @notice The last calculated amount of rewards per token.
+    uint256 public optionRewardPerTokenStored;
 
     /// @notice The last time at which staking rewards were calculated.
     uint32 public lastUpdateTime = uint32(block.timestamp);
 
     /// @notice The total amount of synthetic supply being staked.
     /// @dev Calculated by summing total lp tokens staked * yield booster.
-    uint96 public stakedTotalSupply;
-
-    /// @notice The last calculated amount of rewards per token.
-    uint256 public rewardPerTokenStored;
+    uint128 public optionStakedTotalSupply;
 
     /// @notice Mapping of bondId to bond details.
-    mapping(uint256 => Bond) private _bonds;
+    mapping(uint256 => OptionBond) private _bonds;
+
+    MintBurnToken public immutable callOptionToken;
+    MintBurnToken public immutable lpToken;
+    BondingNft public immutable optionBondingNft;
+    PuttyV2 public immutable putty;
+    IERC20 public immutable weth;
 
     /**
      * @notice Emitted when LP tokens are staked.
      * @param bondId The tokenId of the new bond.
      * @param bond The bond details.
      */
-    event Stake(uint256 bondId, Bond bond);
+    event OptionStake(uint256 bondId, OptionBond bond);
 
     /**
      * @notice Emitted when LP tokens are unstaked.
      * @param bondId The tokenId of the bond being unstaked.
      * @param bond The bond details.
      */
-    event Unstake(uint256 bondId, Bond bond);
+    event OptionUnstake(uint256 bondId, OptionBond bond);
 
     constructor(address _lpToken, address _callOptionToken, address _putty, address _weth) Owned(msg.sender) {
         lpToken = MintBurnToken(_lpToken);
         callOptionToken = MintBurnToken(_callOptionToken);
         putty = PuttyV2(_putty);
         weth = IERC20(_weth);
-        bondingNft = new BondingNft();
+        optionBondingNft = new BondingNft("Wheyfu LP Option Bonds", "WLPOB");
     }
 
     /**
+     * ~~~~~~~~~~~~~~~~~
      * STAKING FUNCTIONS
+     * ~~~~~~~~~~~~~~~~~
      */
 
     /**
-     * @notice stakes an amount of lp tokens for a given term.
-     * @param amount amount of lp tokens to stake.
-     * @param termIndex index into the terms array which tells how long to stake for.
+     * @notice Stakes an amount of lp tokens for a given term.
+     * @param amount Amount of lp tokens to stake.
+     * @param termIndex Index into the terms array which tells how long to stake for.
      */
-    function stake(uint96 amount, uint256 termIndex) public returns (uint256 tokenId) {
-        // mint the bond
-        totalBondSupply += 1;
-        tokenId = totalBondSupply;
-        bondingNft.mint(msg.sender, tokenId);
-
+    function optionStake(uint128 amount, uint256 termIndex) public returns (uint256 tokenId) {
         // update the rewards for everyone
-        rewardPerTokenStored = uint256(rewardPerToken());
+        optionRewardPerTokenStored = uint256(rewardPerToken());
+
+        // mint the bond
+        optionBondTotalSupply += 1;
+        tokenId = optionBondTotalSupply;
+        optionBondingNft.mint(msg.sender, tokenId);
 
         // set the bond parameters
-        Bond storage bond = _bonds[tokenId];
-        bond.rewardPerTokenCheckpoint = uint256(rewardPerTokenStored);
+        OptionBond storage bond = _bonds[tokenId];
+        bond.rewardPerTokenCheckpoint = uint256(optionRewardPerTokenStored);
         bond.depositAmount = amount;
         bond.depositTimestamp = uint32(block.timestamp);
         bond.termIndex = uint8(termIndex);
 
         // update last update time and staked total supply
         lastUpdateTime = uint32(block.timestamp);
-        stakedTotalSupply += uint96((uint256(amount) * termBoosters[termIndex]) / 1e18);
+        optionStakedTotalSupply += uint128((uint256(amount) * termBoosters[termIndex]) / 1e18);
 
         // transfer lp tokens from sender
         lpToken.transferFrom(msg.sender, address(this), amount);
 
-        emit Stake(tokenId, bond);
+        emit OptionStake(tokenId, bond);
     }
 
     /**
-     * @notice unstakes a bond, returns lp tokens and mints call option tokens.
-     * @param tokenId the tokenId of the bond to unstake.
+     * @notice Unstakes a bond, returns lp tokens and mints call option tokens.
+     * @param tokenId The tokenId of the bond to unstake.
      */
-    function unstake(uint256 tokenId) public returns (uint256 callOptionAmount) {
+    function optionUnstake(uint256 tokenId) public returns (uint256 callOptionAmount) {
         // check that the user owns the bond
-        require(msg.sender == bondingNft.ownerOf(tokenId), "Not owner");
+        require(msg.sender == optionBondingNft.ownerOf(tokenId), "Not owner");
 
         // check that the bond has matured
-        Bond memory bond = _bonds[tokenId];
+        OptionBond memory bond = _bonds[tokenId];
         require(block.timestamp >= bond.depositTimestamp + terms[bond.termIndex], "Bond not matured");
 
-        // burn the bond
-        bondingNft.burn(tokenId);
-
         // update the rewards for everyone
-        rewardPerTokenStored = uint256(rewardPerToken());
+        optionRewardPerTokenStored = uint256(rewardPerToken());
+
+        // burn the bond
+        optionBondingNft.burn(tokenId);
 
         // update last update time and staked total supply
         lastUpdateTime = uint32(block.timestamp);
         uint256 amount = bond.depositAmount;
-        stakedTotalSupply -= uint96((amount * termBoosters[bond.termIndex]) / 1e18);
+        optionStakedTotalSupply -= uint128((uint256(amount) * termBoosters[bond.termIndex]) / 1e18);
 
         // send lp tokens back to sender
         lpToken.transfer(msg.sender, amount);
 
         // mint call option rewards to sender
-        callOptionAmount = earned(tokenId);
+        callOptionAmount = optionEarned(tokenId);
         callOptionToken.mint(msg.sender, callOptionAmount);
 
-        emit Unstake(tokenId, bond);
+        emit OptionUnstake(tokenId, bond);
     }
 
+    /**
+     * @notice Gets the total amount of token rewards earned per token staked.
+     * Should not accrue any more rewards if we are past the finishAt timestamp.
+     */
     function rewardPerToken() public view returns (uint256) {
-        if (stakedTotalSupply == 0) {
-            return rewardPerTokenStored;
+        if (optionStakedTotalSupply == 0) {
+            return optionRewardPerTokenStored;
         }
 
         uint256 delta = Math.min(block.timestamp, finishAt) - Math.min(lastUpdateTime, finishAt);
 
-        return rewardPerTokenStored + ((delta * rewardRate * 1e18) / stakedTotalSupply);
-    }
-
-    function earned(uint256 tokenId) public view returns (uint256) {
-        Bond storage bond = _bonds[tokenId];
-        uint256 amount = bond.depositAmount;
-
-        return (((amount * termBoosters[bond.termIndex]) / 1e18) * (rewardPerToken() - bond.rewardPerTokenCheckpoint))
-            / 1e18;
+        return optionRewardPerTokenStored + ((delta * rewardRate * 1e18) / optionStakedTotalSupply);
     }
 
     /**
+     * @notice Gets the total amount of option tokens earned for a bond.
+     * @param tokenId The id of the bond.
+     */
+    function optionEarned(uint256 tokenId) public view returns (uint256) {
+        OptionBond storage bond = _bonds[tokenId];
+        uint256 syntheticAmount = (bond.depositAmount * termBoosters[bond.termIndex]) / 1e18;
+
+        return (syntheticAmount * (rewardPerToken() - bond.rewardPerTokenCheckpoint)) / 1e18;
+    }
+
+    /**
+     * ~~~~~~~~~~~~~~~~
      * OPTION FUNCTIONS
+     * ~~~~~~~~~~~~~~~~
      */
 
     /**
-     * @notice burns call option tokens and converts them into an actual call option contract via putty.
-     * @param numAssets the amount of assets to put into the call option.
-     * @param nonce the nonce for the call option (prevents hash collisions).
+     * @notice Burns call option tokens and converts them into an actual call option contract via putty.
+     * @param numAssets The amount of assets to put into the call option.
+     * @param nonce The nonce for the call option (prevents hash collisions).
      */
     function convertToOption(uint256 numAssets, uint256 nonce)
         public
@@ -221,17 +237,20 @@ contract OptionBonding is IERC1271, Owned {
         shortOrder.expiration = block.timestamp + 1;
         shortOrder.nonce = nonce;
         shortOrder.erc721Assets = new PuttyV2.ERC721Asset[](1);
-        shortOrder.erc721Assets[0] = PuttyV2.ERC721Asset({token: address(this), tokenId: type(uint256).max - numAssets});
+        shortOrder.erc721Assets[0] = PuttyV2.ERC721Asset({
+            token: address(this),
+            tokenId: type(uint256).max - numAssets // this value is used to determine how many tokens to mint in onExercise
+        });
 
         // burn the call option tokens from the sender
-        uint256 amount = numAssets * 1e18;
-        callOptionToken.burn(msg.sender, amount);
+        callOptionToken.burn(msg.sender, numAssets * 1e18);
 
         // mint the option and send the long option to the sender
         longTokenId = _mintOption(shortOrder);
         putty.transferFrom(address(this), msg.sender, longTokenId);
     }
 
+    // @notice Guard variable that tells us whether or not we are minting an option.
     uint256 public mintingOption = 1;
 
     /**
@@ -256,24 +275,32 @@ contract OptionBonding is IERC1271, Owned {
     }
 
     /**
-     * @notice withdraws the eth earned from exercised call options.
-     * @param orders the orders/options that were exercised.
-     * @param recipient who to send the weth to.
+     * @notice Withdraws the eth earned from exercised call options.
+     * @param orders The options that were exercised.
+     * @param recipient Who to send the weth to.
      */
     function withdrawWeth(PuttyV2.Order[] memory orders, address recipient) public onlyOwner {
         for (uint256 i = 0; i < orders.length; i++) {
+            // withdraw all the strike weth form exercised options
             putty.withdraw(orders[i]);
         }
 
+        // transfer all of the earned weth to the recipient
         weth.transfer(recipient, weth.balanceOf(address(this)));
     }
+
+    /**
+     * ~~~~~~~~~~~~~~~~~
+     * MISC. FUNCTIONS
+     * ~~~~~~~~~~~~~~~~~
+     */
 
     /**
      * @notice Getter for bond details.
      * @param tokenId The tokenId to fetch info for.
      * @return bondDetails The bond details.
      */
-    function bonds(uint256 tokenId) public view returns (Bond memory) {
+    function bonds(uint256 tokenId) public view returns (OptionBond memory) {
         return _bonds[tokenId];
     }
 }

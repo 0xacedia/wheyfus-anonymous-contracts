@@ -17,9 +17,9 @@ import {MockERC20} from "./mocks/MockERC20.sol";
 import {MockWeth} from "./mocks/MockWeth.sol";
 
 import "../src/Wheyfu.sol";
-import "../src/MintBurnToken.sol";
+import "../src/lib/MintBurnToken.sol";
 import "../src/OptionBonding.sol";
-import "../src/BondingNft.sol";
+import "../src/lib/BondingNft.sol";
 import "../src/TokenUri.sol";
 
 contract Fixture is Test {
@@ -60,7 +60,7 @@ contract Fixture is Test {
         p = new PuttyV2("https://base", 0, address(weth));
         w = new Wheyfu(address(lp), address(co), address(p), address(weth));
         t = new TokenUri(payable(address(w)));
-        b = w.bondingNft();
+        b = w.optionBondingNft();
         feeB = w.feeBondingNft();
 
         uint256[] memory empty = new uint256[](0);

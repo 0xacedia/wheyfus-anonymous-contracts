@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import "../Fixture.t.sol";
+import "../../Fixture.t.sol";
 
 contract AddLiquidityTest is Fixture {
     event AddLiquidity(uint256 tokenAmount, uint256 nftAmount, uint256 shares);

@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 
 import "../Fixture.t.sol";
 
-contract StakeUnstakeTest is Fixture, ERC721TokenReceiver {
+contract OptionStakeUnstakeTest is Fixture, ERC721TokenReceiver {
     struct Stake {
         uint96 amount;
         uint16 skip;
@@ -20,7 +20,7 @@ contract StakeUnstakeTest is Fixture, ERC721TokenReceiver {
 
     function setUp() public {}
 
-    function testStakeUnstake(Stake[] memory stakes) public {
+    function testOptionStakeUnstake(Stake[] memory stakes) public {
         uint256[] memory withdrawTimes = new uint256[](stakes.length);
         uint256[] memory totalEarned = new uint256[](stakes.length);
         bool[] memory withdrawn = new bool[](stakes.length);
@@ -39,14 +39,14 @@ contract StakeUnstakeTest is Fixture, ERC721TokenReceiver {
                 uint256 amount = stakes[j].amount;
                 totalEarned[j] += (amount * ((timeElapsedSinceLastCheck * w.rewardRate() * 1e18) / totalStaked)) / 1e18;
 
-                assertApproxEqAbs(w.earned(j + 1), totalEarned[j], 10, "Should have accrued rewards correctly");
+                assertApproxEqAbs(w.optionEarned(j + 1), totalEarned[j], 10, "Should have accrued rewards correctly");
             }
 
             for (uint256 k = 0; k < i; k++) {
                 if (withdrawTimes[k] < block.timestamp && !withdrawn[k]) {
                     address wPerson = address(uint160(type(uint256).max - k));
                     vm.startPrank(wPerson);
-                    w.unstake(k + 1);
+                    w.optionUnstake(k + 1);
                     vm.stopPrank();
 
                     withdrawn[k] = true;
@@ -60,7 +60,7 @@ contract StakeUnstakeTest is Fixture, ERC721TokenReceiver {
             vm.startPrank(person);
 
             deal(address(lp), person, stake.amount, true);
-            w.stake(stake.amount, 0);
+            w.optionStake(stake.amount, 0);
             skip(1 days + stake.skip);
             timeElapsedSinceLastCheck = 1 days + stake.skip;
             totalTimeElapsed += 1 days + stake.skip;
@@ -69,7 +69,7 @@ contract StakeUnstakeTest is Fixture, ERC721TokenReceiver {
 
             vm.stopPrank();
 
-            assertEq(w.stakedTotalSupply(), totalStaked, "Should have increased total staked");
+            assertEq(w.optionStakedTotalSupply(), totalStaked, "Should have increased total staked");
         }
 
         uint256 total = 0;

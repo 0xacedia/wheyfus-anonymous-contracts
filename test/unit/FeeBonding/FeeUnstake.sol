@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
-import "../Fixture.t.sol";
+import "../../Fixture.t.sol";
 
 contract FeeUnstakeTest is Fixture {
     uint96 public amount;

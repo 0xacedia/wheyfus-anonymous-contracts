@@ -29,11 +29,11 @@ contract FullFlowTest is Fixture, ERC721TokenReceiver {
         uint256 shares = w.addLiquidity{value: 1 ether}(tokenIds, 0, type(uint256).max);
 
         // stake
-        uint256 tokenId = w.stake(uint96(shares), 0);
+        uint256 tokenId = w.optionStake(uint96(shares), 0);
 
         // unstake
         skip(10 days);
-        uint256 callOptionAmount = w.unstake(tokenId);
+        uint256 callOptionAmount = w.optionUnstake(tokenId);
 
         // convert to option
         (uint256 longTokenId, PuttyV2.Order memory shortOrder) = w.convertToOption(20, 1);

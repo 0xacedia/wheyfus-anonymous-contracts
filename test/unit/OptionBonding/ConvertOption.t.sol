@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import {PuttyV2} from "putty-v2/PuttyV2.sol";
-import "../Fixture.t.sol";
+import "../../Fixture.t.sol";
 
 contract ConvertOptionTest is Fixture {
     using stdStorage for StdStorage;
@@ -32,7 +32,6 @@ contract ConvertOptionTest is Fixture {
 
         // assert
         assertEq(p.ownerOf(longPosition), address(this), "Should have sent long option to convertor");
-
         assertEq(
             p.ownerOf(uint256(p.hashOrder(shortOrder))), address(w), "Should have sent short option to wheyfu contract"
         );

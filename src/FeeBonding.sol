@@ -9,9 +9,19 @@ import {Owned} from "solmate/auth/Owned.sol";
 import {PuttyV2} from "putty-v2/PuttyV2.sol";
 import {LSSVMPairMissingEnumerableETH} from "lssvm/LSSVMPairMissingEnumerableETH.sol";
 
-import {MintBurnToken} from "./MintBurnToken.sol";
-import {BondingNft} from "./BondingNft.sol";
+import {MintBurnToken} from "./lib/MintBurnToken.sol";
+import {BondingNft} from "./lib/BondingNft.sol";
 
+/**
+ * @notice Fee bonding stuff.
+ *
+ * LP's stake their LP tokens for preset bond durations. In return they receive
+ * fee rewards from the shared sudo xyk pool. Fees can be claimed after the bond matures.
+ * The longer the bond duration, the higher the yield boost. Fees are distributed via the
+ * skim() method.
+ *
+ * @author 0xacedia
+ */
 contract FeeBonding {
     /**
      * @notice Bond details.
@@ -22,7 +32,7 @@ contract FeeBonding {
      */
     struct FeeBond {
         uint256 rewardPerTokenCheckpoint;
-        uint96 depositAmount;
+        uint128 depositAmount;
         uint32 depositTimestamp;
         uint8 termIndex;
     }
@@ -41,23 +51,32 @@ contract FeeBonding {
 
     /// @notice The total amount of synthetic supply being staked.
     /// @dev Calculated by summing total lp tokens staked * yield booster.
-    uint96 public feeStakedTotalSupply;
-
-    /// @notice The nft contract that represents bonds.
-    BondingNft public immutable feeBondingNft;
-
-    /// @notice The ERC20 token that represents lp shares in the sudoswap pool.
-    MintBurnToken private immutable lpToken;
-
-    /// @notice The sudoswap pool.
-    LSSVMPairMissingEnumerableETH private pair;
+    uint128 public feeStakedTotalSupply;
 
     /// @notice Mapping of bondId to bond details.
     mapping(uint256 => FeeBond) private _bonds;
 
+    BondingNft public immutable feeBondingNft;
+    MintBurnToken private immutable lpToken;
+    LSSVMPairMissingEnumerableETH private pair;
+
+    /**
+     * @notice Emitted when LP tokens are staked.
+     * @param bondId The tokenId of the new bond.
+     * @param bond The bond details.
+     */
+    event FeeStake(uint256 bondId, FeeBond bond);
+
+    /**
+     * @notice Emitted when LP tokens are unstaked.
+     * @param bondId The tokenId of the bond being unstaked.
+     * @param bond The bond details.
+     */
+    event FeeUnstake(uint256 bondId, FeeBond bond);
+
     constructor(address _lpToken) {
         lpToken = MintBurnToken(_lpToken);
-        feeBondingNft = new BondingNft();
+        feeBondingNft = new BondingNft("Wheyfu LP Fee Bonds", "WLPFB");
     }
 
     /**
@@ -69,6 +88,12 @@ contract FeeBonding {
     }
 
     /**
+     * ~~~~~~~~~~~~~~~~~
+     * STAKING FUNCTIONS
+     * ~~~~~~~~~~~~~~~~~
+     */
+
+    /**
      * @notice Skims the fees from the sudoswap pool and distributes them to fee stakers.
      */
     function skim() public returns (uint256) {
@@ -77,17 +102,19 @@ contract FeeBonding {
         pair.withdrawETH(fees);
 
         // distribute the fees to stakers
-        feeRewardPerTokenStored += feeStakedTotalSupply > 0 ? (fees * 1e18) / feeStakedTotalSupply : 0;
+        if (fees > 0 && feeStakedTotalSupply > 0) {
+            feeRewardPerTokenStored += (fees * 1e18) / feeStakedTotalSupply;
+        }
 
         return fees;
     }
 
     /**
-     * @notice stakes an amount of lp tokens for a given term.
-     * @param amount amount of lp tokens to stake.
-     * @param termIndex index into the terms array which tells how long to stake for.
+     * @notice Stakes an amount of lp tokens for a given term.
+     * @param amount Amount of lp tokens to stake.
+     * @param termIndex Index into the terms array which tells how long to stake for.
      */
-    function feeStake(uint96 amount, uint256 termIndex) public returns (uint256 tokenId) {
+    function feeStake(uint128 amount, uint256 termIndex) public returns (uint256 tokenId) {
         // update the rewards for everyone
         skim();
 
@@ -104,15 +131,17 @@ contract FeeBonding {
         bond.termIndex = uint8(termIndex);
 
         // update the staked total supply
-        feeStakedTotalSupply += uint96((uint256(amount) * termBoosters[termIndex]) / 1e18);
+        feeStakedTotalSupply += uint128((uint256(amount) * termBoosters[termIndex]) / 1e18);
 
         // transfer lp tokens from sender
         lpToken.transferFrom(msg.sender, address(this), amount);
+
+        emit FeeStake(tokenId, bond);
     }
 
     /**
-     * @notice unstakes a bond, returns lp tokens and mints call option tokens.
-     * @param tokenId the tokenId of the bond to unstake.
+     * @notice Unstakes a bond, returns lp tokens and mints call option tokens.
+     * @param tokenId The tokenId of the bond to unstake.
      */
     function feeUnstake(uint256 tokenId) public returns (uint256 rewardAmount) {
         // check that the user owns the bond
@@ -130,7 +159,7 @@ contract FeeBonding {
 
         // update staked total supply
         uint256 amount = bond.depositAmount;
-        feeStakedTotalSupply -= uint96((amount * termBoosters[bond.termIndex]) / 1e18);
+        feeStakedTotalSupply -= uint128((uint256(amount) * termBoosters[bond.termIndex]) / 1e18);
 
         // send lp tokens back to sender
         lpToken.transfer(msg.sender, amount);
@@ -138,6 +167,8 @@ contract FeeBonding {
         // send fee rewards to sender
         rewardAmount = feeEarned(tokenId);
         payable(msg.sender).transfer(rewardAmount);
+
+        emit FeeUnstake(tokenId, bond);
     }
 
     /**
@@ -147,15 +178,13 @@ contract FeeBonding {
      */
     function feeEarned(uint256 tokenId) public view returns (uint256) {
         FeeBond storage bond = _bonds[tokenId];
-        uint256 amount = bond.depositAmount;
+        uint256 syntheticAmount = (bond.depositAmount * termBoosters[bond.termIndex]) / 1e18;
 
-        return (
-            ((amount * termBoosters[bond.termIndex]) / 1e18) * (feeRewardPerTokenStored - bond.rewardPerTokenCheckpoint)
-        ) / 1e18;
+        return (syntheticAmount * (feeRewardPerTokenStored - bond.rewardPerTokenCheckpoint)) / 1e18;
     }
 
     /**
-     * @notice Getter for bond details.
+     * @notice Getter for fee bond details.
      * @param tokenId The tokenId to fetch info for.
      * @return bondDetails The bond details.
      */

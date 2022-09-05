@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import "../Fixture.t.sol";
+import "../../Fixture.t.sol";
 
 contract OptionStakeTest is Fixture {
     uint96 public amount;
@@ -17,7 +17,7 @@ contract OptionStakeTest is Fixture {
         uint256 balanceBefore = lp.balanceOf(address(this));
 
         // act
-        w.stake(amount, 0);
+        w.optionStake(amount, 0);
 
         // assert
         assertEq(balanceBefore - lp.balanceOf(address(this)), amount, "Should have burned lp tokens");
@@ -29,10 +29,10 @@ contract OptionStakeTest is Fixture {
         uint256 termBooster = w.termBoosters(termIndex);
 
         // act
-        w.stake(amount, termIndex);
+        w.optionStake(amount, termIndex);
 
         // assert
-        assertEq(w.stakedTotalSupply(), (amount * termBooster) / 1e18, "Should have updated staked total supply");
+        assertEq(w.optionStakedTotalSupply(), (amount * termBooster) / 1e18, "Should have updated staked total supply");
     }
 
     function testItUpdatesLastUpdateTime() public {
@@ -40,7 +40,7 @@ contract OptionStakeTest is Fixture {
         skip(100);
 
         // act
-        w.stake(amount, 1);
+        w.optionStake(amount, 1);
 
         // assert
         assertEq(w.lastUpdateTime(), block.timestamp, "Should have updated last update time");
@@ -48,7 +48,7 @@ contract OptionStakeTest is Fixture {
 
     function testItSavesBondDetails() public {
         // arrange
-        uint256 tokenId = w.stake(amount, 1);
+        uint256 tokenId = w.optionStake(amount, 1);
 
         // assert
         assertEq(w.bonds(tokenId).termIndex, 1, "Should have saved bond term index");
@@ -60,13 +60,13 @@ contract OptionStakeTest is Fixture {
     function testItSetsBondRewardPerTokenCheckpointAndRewardPerTokenStored() public {
         // arrange
         uint256 duration = 50;
-        w.stake(amount, 1);
+        w.optionStake(amount, 1);
         skip(duration);
         deal(address(lp), address(this), amount);
         uint256 expectedRewardPerTokenPaid = (w.rewardRate() * duration * 1e18) / ((amount * w.termBoosters(1)) / 1e18);
 
         // act
-        uint256 tokenId = w.stake(amount, 1);
+        uint256 tokenId = w.optionStake(amount, 1);
 
         // assert
         assertEq(
@@ -75,15 +75,15 @@ contract OptionStakeTest is Fixture {
             "Should have updated staked bond reward per token paid"
         );
 
-        assertEq(w.rewardPerTokenStored(), expectedRewardPerTokenPaid, "Should have stored reward per token");
+        assertEq(w.optionRewardPerTokenStored(), expectedRewardPerTokenPaid, "Should have stored reward per token");
     }
 
     function testItMintsBondNft() public {
         // arrange
-        uint256 tokenId = w.stake(amount, 1);
+        uint256 tokenId = w.optionStake(amount, 1);
 
         // assert
         assertEq(b.ownerOf(tokenId), address(this), "Should have minted bond NFT");
-        assertEq(w.totalBondSupply(), 1, "Should incremented total bond supply");
+        assertEq(w.optionBondTotalSupply(), 1, "Should incremented total bond supply");
     }
 }

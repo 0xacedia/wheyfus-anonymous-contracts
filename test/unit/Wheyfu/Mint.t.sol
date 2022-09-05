@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import "../Fixture.t.sol";
+import "../../Fixture.t.sol";
 
 contract MintTest is Fixture {
     using stdStorage for StdStorage;
@@ -15,6 +15,22 @@ contract MintTest is Fixture {
 
         // assert
         assertEq(w.balanceOf(address(this)), 10);
+    }
+
+    function testItMintsTo() public {
+        // arrange
+        uint256 amount = 7;
+        uint256 whitelistBefore = w.mintWhitelist(address(this));
+
+        // act
+        uint256 totalSupply = w.mintTo(amount, babe);
+
+        // assert
+        assertEq(whitelistBefore - w.mintWhitelist(address(this)), amount, "Should have decremented whitelist amount");
+        assertEq(w.balanceOf(babe), amount, "Should have minted tokens to babe");
+        for (uint256 i = totalSupply - amount; i < totalSupply; i++) {
+            assertEq(w.ownerOf(i + 1), babe, "Should have sent token to babe");
+        }
     }
 
     function testItDecrementsMintWhitelist() public {

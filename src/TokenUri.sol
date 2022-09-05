@@ -2,9 +2,9 @@
 pragma solidity 0.8.16;
 
 import {Wheyfu} from "./Wheyfu.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
-import "base64/base64.sol";
-import "hot-chain-svg/SVG.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {Base64} from "base64/base64.sol";
+import {svg} from "hot-chain-svg/SVG.sol";
 
 contract TokenUri {
     string[] public colors = ["#CDB4DB", "#FFC8DD", "#FFAFCC", "#BDE0FE", "#A2D2FF"];

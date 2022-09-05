@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 import {ERC721TokenReceiver} from "solmate/tokens/ERC721.sol";
 
-import "../Fixture.t.sol";
+import "../../Fixture.t.sol";
 
 contract RemoveLiquidityTest is Fixture, ERC721TokenReceiver {
     event RemoveLiquidity(uint256 tokenAmount, uint256 nftAmount, uint256 shares);

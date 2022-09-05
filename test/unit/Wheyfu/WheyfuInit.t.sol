@@ -3,13 +3,13 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import {PuttyV2} from "putty-v2/PuttyV2.sol";
-import "../Fixture.t.sol";
+import "../../Fixture.t.sol";
 
 contract WheyfuInitTest is Fixture {
     function setUp() public {}
 
     function testItSetsMaxSupply() public {
-        assertEq(w.MAX_SUPPLY(), 15_000, "Should have set max supply");
+        assertEq(w.MAX_SUPPLY(), 30_000, "Should have set max supply");
     }
 
     function testItSetsWhitelistAsOpen() public {

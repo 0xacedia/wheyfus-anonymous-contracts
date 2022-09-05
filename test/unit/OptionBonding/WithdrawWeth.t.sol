@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 import {PuttyV2} from "putty-v2/PuttyV2.sol";
 import {ERC721TokenReceiver} from "solmate/tokens/ERC721.sol";
-import "../Fixture.t.sol";
+import "../../Fixture.t.sol";
 
 contract WithdrawWethTest is Fixture, ERC721TokenReceiver {
     uint256[] public tokenIds;

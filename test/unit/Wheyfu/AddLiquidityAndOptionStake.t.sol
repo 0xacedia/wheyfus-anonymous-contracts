@@ -2,9 +2,9 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import "../Fixture.t.sol";
+import "../../Fixture.t.sol";
 
-contract AddLiquidityAndStakeTest is Fixture {
+contract AddLiquidityAndOptionStakeTest is Fixture {
     using stdStorage for StdStorage;
 
     uint256[] public tokenIds;
@@ -24,7 +24,7 @@ contract AddLiquidityAndStakeTest is Fixture {
         uint256 deposit = 1 ether;
 
         // act
-        w.addLiquidityAndStake{value: deposit}(tokenIds, 0, 0, 1);
+        w.addLiquidityAndOptionStake{value: deposit}(tokenIds, 0, 0, 1);
 
         // assert
         assertEq(address(pair).balance, deposit, "Should have transferred ETH to sudo");
@@ -35,7 +35,7 @@ contract AddLiquidityAndStakeTest is Fixture {
         uint256 deposit = 1 ether;
 
         // act
-        uint256 tokenId = w.addLiquidityAndStake{value: deposit}(tokenIds, 0, 0, 1);
+        uint256 tokenId = w.addLiquidityAndOptionStake{value: deposit}(tokenIds, 0, 0, 1);
 
         // assert
         assertEq(b.ownerOf(tokenId), address(this), "Should have minted bond nft to depositer");

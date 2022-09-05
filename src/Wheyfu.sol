@@ -11,46 +11,56 @@ import {PuttyV2} from "putty-v2/PuttyV2.sol";
 import {PuttyV2Handler, IPuttyV2Handler} from "putty-v2/PuttyV2Handler.sol";
 
 import {TokenUri} from "./TokenUri.sol";
-import {MintBurnToken} from "./MintBurnToken.sol";
+import {MintBurnToken} from "./lib/MintBurnToken.sol";
 import {OptionBonding} from "./OptionBonding.sol";
 import {FeeBonding} from "./FeeBonding.sol";
 
+/**
+ * @notice hiya! ~~ welcome to wheyfus :3 ~
+ * General overview:
+ *
+ * Wheyfus is an NFT collection with a max supply of 30,000.
+ * 9000 is distributed via a free mint.
+ * 18000 is reserved for yield farming (distributed over 900 days).
+ * 3000 is minted to the team.
+ *
+ * Yield farming works by LP'ing into a shared xyk curve sudo pool then locking up the LP tokens for a fixed bond duration.
+ * The duration is variable (0 days, 30 days, 90 days etc.). The longer you bond for, the higher your yield boost.
+ * The bonds yield call option tokens which can be converted 1:1 for putty call options on wheyfus. Each call option
+ * expires in 5 years and has a strike of 0.1 eth.
+ *
+ * There is also LP fee farming. This works similarly by LP'ing into a shared xyk curve sudo pool and also locking up LP
+ * tokens for a fixed bond duration. Except this time, instead of yield farming call option tokens, you yield farm the fees
+ * generated from the sudoswap pool. Fees are distributed pro rata based on the amount already staked and your yield boost.
+ *
+ * So there are 2 farms. 1 yielding call option tokens and 1 yielding sudoswap LP fees.
+ *
+ * note: The yield from the LP farm is boosted by the yield from the staked LP tokens in the call option farm. This is because
+ * LPs in the call option farm don't receive any LP fees; instead opting for call option yield.
+ *
+ * thanks for reading *blush* uwu
+ *
+ * @author 0xacedia
+ */
 contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, PuttyV2Handler {
-    /**
-     * @notice The max supply of wheyfus.
-     * @dev 9k for yield farming, 4.5k for free mint, 1.5k for team.
-     */
-    uint256 public constant MAX_SUPPLY = 15_000;
+    /// @notice The max supply of wheyfus.
+    /// @dev 18k for yield farming, 8k for free mint, 3k for team.
+    uint256 public constant MAX_SUPPLY = 30_000;
 
-    /**
-     * @notice Whether or not the whitelist can be modified.
-     */
-    bool public closedWhitelist = false;
-
-    /**
-     * @notice The total whitelisted supply.
-     * @dev This should never exceed the max supply.
-     */
-    uint256 public whitelistedSupply;
-
-    /**
-     * @notice The total minted supply.
-     */
+    /// @notice The total minted supply.
     uint256 public totalSupply;
 
-    /**
-     * @notice Mapping of address -> whitelist amount.
-     */
+    /// @notice Whether or not the whitelist can be modified.
+    bool public closedWhitelist = false;
+
+    /// @notice The total whitelisted supply.
+    /// @dev This should never exceed the max supply.
+    uint256 public whitelistedSupply;
+
+    /// @notice Mapping of address -> whitelist amount.
     mapping(address => uint256) public mintWhitelist;
 
-    /**
-     * @notice The sudoswap pool.
-     */
     LSSVMPairMissingEnumerableETH public pair;
-
-    /**
-     * @notice The address of the contract that constructs the tokenURI.
-     */
     TokenUri public tokenUri;
 
     /**
@@ -83,9 +93,17 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
      * @param _pair The sudoswap pool.
      */
     function setPair(address payable _pair) public onlyOwner {
+        require(address(pair) == address(0), "Pair already set");
+
         pair = LSSVMPairMissingEnumerableETH(_pair);
         _setPair(_pair);
     }
+
+    /**
+     * ~~~~~~~~~~~~~~~
+     * ADMIN FUNCTIONS
+     * ~~~~~~~~~~~~~~~
+     */
 
     /**
      * @notice Sets the tokenURI contract.
@@ -97,10 +115,17 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
 
     /**
      * @notice Closes the whitelist.
+     * @dev After this point the whitelist can no longer be modified.
      */
     function closeWhitelist() public onlyOwner {
         closedWhitelist = true;
     }
+
+    /**
+     * ~~~~~~~~~~~~~~~~~
+     * MINTING FUNCTIONS
+     * ~~~~~~~~~~~~~~~~~
+     */
 
     /**
      * @notice Whitelists a minter so that they can mint a certain amount.
@@ -112,28 +137,15 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
         require(!closedWhitelist, "Whitelist has been closed");
 
         // check whitelisted supply + amount is less than the max supply
-        require(whitelistedSupply + amount < MAX_SUPPLY, "Max supply already reached");
+        require(whitelistedSupply + amount <= MAX_SUPPLY, "Max supply already reached");
 
-        // increment/decrement the whitelistedSupply
+        // increment/decrement the new whitelistedSupply
         uint256 oldAmount = mintWhitelist[target];
         whitelistedSupply -= oldAmount;
         whitelistedSupply += amount;
 
         // save the new whitelist amount to the target
         mintWhitelist[target] = amount;
-    }
-
-    /**
-     * MINTING FUNCTIONS
-     */
-
-    /**
-     * @notice Mints a certain amount of nfts to an address.
-     * @param amount The amount of nfts to mint.
-     * @param to Who to mint the nfts to.
-     */
-    function mintTo(uint256 amount, address to) public returns (uint256) {
-        return _mintTo(amount, to, msg.sender);
     }
 
     /**
@@ -144,6 +156,15 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
         mintTo(amount, msg.sender);
 
         return totalSupply;
+    }
+
+    /**
+     * @notice Mints a certain amount of nfts to an address.
+     * @param amount The amount of nfts to mint.
+     * @param to Who to mint the nfts to.
+     */
+    function mintTo(uint256 amount, address to) public returns (uint256) {
+        return _mintTo(amount, to, msg.sender);
     }
 
     /**
@@ -164,7 +185,7 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
         // increase the balance of the to account
         _balanceOf[to] += amount;
 
-        // increaset the total supply
+        // increase the total supply
         totalSupply += amount;
 
         // decrease the whitelisted amount from the from account
@@ -188,15 +209,17 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
     }
 
     /**
+     * ~~~~~~~~~~~~~~~~~~~~~~~
      * SUDOSWAP POOL FUNCTIONS
+     * ~~~~~~~~~~~~~~~~~~~~~~~
      */
 
     /**
-     * @notice adds liquidity to the shared sudoswap pool and mints lp tokens.
-     * @dev updates the sudo reserves.
-     * @param tokenIds the tokenIds of the nfts to send to the sudoswap pool.
-     * @param minPrice the min price to lp at.
-     * @param maxPrice the max price to lp at.
+     * @notice Adds liquidity to the shared sudoswap pool and mints lp tokens.
+     * @dev Updates the sudo reserves.
+     * @param tokenIds The tokenIds of the nfts to send to the sudoswap pool.
+     * @param minPrice The min price to lp at.
+     * @param maxPrice The max price to lp at.
      */
     function addLiquidity(uint256[] calldata tokenIds, uint256 minPrice, uint256 maxPrice)
         public
@@ -222,7 +245,7 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
 
         // deposit tokens to sudoswap pool
         for (uint256 i = 0; i < tokenIds.length;) {
-            _transferFrom(msg.sender, address(pair), tokenIds[i]);
+            _safeTransferFrom(msg.sender, address(pair), tokenIds[i]);
 
             unchecked {
                 i++;
@@ -236,11 +259,11 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
     }
 
     /**
-     * @notice removes liquidity from the shared sudoswap pool and burns lp tokens.
-     * @dev updates the sudo reserves.
-     * @param tokenIds the tokenIds of the nfts to remove from the sudoswap pool.
-     * @param minPrice the min price to remove the lp at.
-     * @param maxPrice the max price to remove lp at.
+     * @notice Removes liquidity from the shared sudoswap pool and burns lp tokens.
+     * @dev Updates the sudo reserves.
+     * @param tokenIds The tokenIds of the nfts to remove from the sudoswap pool.
+     * @param minPrice The min price to remove the lp at.
+     * @param maxPrice The max price to remove lp at.
      */
     function removeLiquidity(uint256[] calldata tokenIds, uint256 minPrice, uint256 maxPrice) public {
         // check current price is in between min and max
@@ -264,7 +287,7 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
 
         // send tokens to user
         for (uint256 i = 0; i < tokenIds.length;) {
-            _transferFrom(address(this), msg.sender, tokenIds[i]);
+            _safeTransferFrom(address(this), msg.sender, tokenIds[i]);
 
             unchecked {
                 i++;
@@ -312,51 +335,78 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
     }
 
     /**
+     * ~~~~~~~~~~~~~~~~~~~
      * PERIPHERY FUNCTIONS
+     * ~~~~~~~~~~~~~~~~~~~
      */
 
     /**
-     * @notice wrapper around addLiquidity() and stake()
-     * @param tokenIds the tokenIds of the nfts to send to the sudoswap pool.
-     * @param minPrice the min price to lp at.
-     * @param maxPrice the max price to lp at.
-     * @param termIndex index into the terms array which tells how long to stake for.
+     * @notice Wrapper around addLiquidity() and optionStake()
+     * @param tokenIds The tokenIds of the nfts to send to the sudoswap pool.
+     * @param minPrice The min price to lp at.
+     * @param maxPrice The max price to lp at.
+     * @param termIndex Index into the terms array which tells how long to stake for.
      */
-    function addLiquidityAndStake(uint256[] calldata tokenIds, uint256 minPrice, uint256 maxPrice, uint256 termIndex)
+    function addLiquidityAndOptionStake(
+        uint256[] calldata tokenIds,
+        uint256 minPrice,
+        uint256 maxPrice,
+        uint256 termIndex
+    )
         public
         payable
         returns (uint256 tokenId)
     {
         uint256 shares = addLiquidity(tokenIds, minPrice, maxPrice);
-        tokenId = stake(uint96(shares), termIndex);
+        tokenId = optionStake(uint128(shares), termIndex);
     }
 
     /**
+     * @notice Wrapper around addLiquidity() and feeStake()
+     * @param tokenIds The tokenIds of the nfts to send to the sudoswap pool.
+     * @param minPrice The min price to lp at.
+     * @param maxPrice The max price to lp at.
+     * @param termIndex Index into the terms array which tells how long to stake for.
+     */
+    function addLiquidityAndFeeStake(uint256[] calldata tokenIds, uint256 minPrice, uint256 maxPrice, uint256 termIndex)
+        public
+        payable
+        returns (uint256 tokenId)
+    {
+        uint256 shares = addLiquidity(tokenIds, minPrice, maxPrice);
+        tokenId = feeStake(uint128(shares), termIndex);
+    }
+
+    /**
+     * ~~~~~~~~~~~~~~~~~~
      * OVERRIDE FUNCTIONS
+     * ~~~~~~~~~~~~~~~~~~
      */
 
     /**
-     * @notice when the call option is exercised putty will call this function. it mints
-     * nfts to the exerciser.
-     * @dev    should only be callable by putty. we defer the mint to here instead of on
-     * call option creation to save gas.
+     * @notice When the call option is exercised putty will call this function. it mints nfts to the exerciser.
+     * @dev Should only be callable by putty. We defer the mint to here instead of on call option creation to save gas.
      */
-    function onExercise(PuttyV2.Order memory order, address exerciser, uint256[] memory floorAssetTokenIds)
-        public
-        override
-    {
-        // if we were the maker of the order then it must be a short call and the tokens
+    function onExercise(PuttyV2.Order memory order, address exerciser, uint256[] memory) public override {
+        // If we were the maker of the order then it must be a short call and the tokens
         // need to be minted because we initially skipped transferring them in.
         if (order.maker == address(this) && msg.sender == address(putty)) {
             _mintTo(type(uint256).max - order.erc721Assets[0].tokenId, exerciser, address(putty));
         }
     }
 
+    /**
+     * @notice Tells putty that we support the handler interface.
+     */
     function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
         return interfaceId == type(IPuttyV2Handler).interfaceId || super.supportsInterface(interfaceId);
     }
 
-    function _transferFrom(address from, address to, uint256 id) internal virtual {
+    /**
+     * @dev Internal _safeTransferFrom() that ignores the authorized checks.
+     * Skips checking that from == msg.sender, approvals etc.
+     */
+    function _safeTransferFrom(address from, address to, uint256 id) internal virtual {
         require(from == _ownerOf[id], "WRONG_FROM");
 
         require(to != address(0), "INVALID_RECIPIENT");
@@ -382,6 +432,10 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
         );
     }
 
+    /**
+     * @dev safeTransferFrom() skips transfers if `mintingOption` is set to true.
+     * And also skips transfers if putty is trying to transfer on exercise.
+     */
     function safeTransferFrom(address from, address to, uint256 tokenId) public override {
         // if minting an option then no need to transfer
         // (means that we need to mint onExercise instead)
@@ -400,6 +454,10 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
         super.safeTransferFrom(from, to, tokenId);
     }
 
+    /**
+     * @notice Returns the tokenURI of a particular token.
+     * This method can be "edited" by changing the tokenUri contract variable.
+     */
     function tokenURI(uint256 id) public view virtual override returns (string memory) {
         return tokenUri.tokenURI(id);
     }
