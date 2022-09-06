@@ -44,7 +44,7 @@ import {FeeBonding} from "./FeeBonding.sol";
  */
 contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, PuttyV2Handler {
     /// @notice The max supply of wheyfus.
-    /// @dev 18k for yield farming, 8k for free mint, 3k for team.
+    /// @dev 18k for yield farming, 9k for free mint, 3k for team.
     uint256 public constant MAX_SUPPLY = 30_000;
 
     /// @notice The total minted supply.
