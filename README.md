@@ -153,4 +153,4 @@ yield.
 
 **skim()**
 
-Skims any surplus fees generated from the shared sudoswap pool and distributes it to stakers.
+Skims any surplus fees generated from the shared sudoswap xyk pool and distributes it to stakers.
