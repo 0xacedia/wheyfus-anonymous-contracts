@@ -90,9 +90,10 @@ contract Fixture is Test {
 
     function setupSudoswap() public {
         LSSVMPairMissingEnumerableETH pairMissingEnumerableETHTemplate = new LSSVMPairMissingEnumerableETH();
+        LSSVMPairEnumerableETH pairEnumerableETHTemplate = new LSSVMPairEnumerableETH();
 
         sudoPairFactory = new LSSVMPairFactory(
-            LSSVMPairEnumerableETH(payable(0)),
+            LSSVMPairEnumerableETH(payable(address(pairMissingEnumerableETHTemplate))),
             pairMissingEnumerableETHTemplate,
             LSSVMPairEnumerableERC20(payable(0)),
             LSSVMPairMissingEnumerableERC20(payable(0)),

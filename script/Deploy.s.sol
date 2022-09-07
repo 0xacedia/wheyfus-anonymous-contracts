@@ -34,8 +34,10 @@ contract DeployScript is Script {
         Wheyfu wheyfu = new Wheyfu(address(lp), address(co), putty, weth);
         console.log("wheyfu:");
         console.log(address(wheyfu));
-        console.log("bonding nft:");
+        console.log("option bonding nft:");
         console.log(address(wheyfu.optionBondingNft()));
+        console.log("fee bonding nft:");
+        console.log(address(wheyfu.feeBondingNft()));
         TokenUri tokenUri = new TokenUri(payable(address(wheyfu)));
 
         // create the wheyfu:eth sudoswap pair
@@ -67,14 +69,12 @@ contract DeployScript is Script {
 
         co.setOwner(address(wheyfu));
 
-        // authorize the putty contract to mint 1000 wheyfu NFTs
-        // this can be increased in the future to 9000 but set it
-        // to be low as a safety measure for now.
-        wheyfu.whitelistMinter(address(putty), 1000);
+        // authorize the putty contract to mint 18k wheyfu nfts
+        wheyfu.whitelistMinter(address(putty), 18_000);
 
         // seed the pair with some liquidity
         wheyfu.whitelistMinter(msg.sender, 50);
-        wheyfu.mint(10);
+        wheyfu.mint(20);
 
         uint256[] memory tokenIds = new uint256[](5);
         tokenIds[0] = 1;
@@ -82,6 +82,14 @@ contract DeployScript is Script {
         tokenIds[2] = 3;
         tokenIds[3] = 4;
         tokenIds[4] = 5;
-        wheyfu.addLiquidityAndOptionStake{value: 0.03 ether}(tokenIds, 0, type(uint256).max, 1);
+        wheyfu.addLiquidityAndOptionStake{value: 0.012 ether}(tokenIds, 0, type(uint256).max, 1);
+
+        tokenIds = new uint256[](5);
+        tokenIds[0] = 6;
+        tokenIds[1] = 7;
+        tokenIds[2] = 8;
+        tokenIds[3] = 9;
+        tokenIds[4] = 10;
+        wheyfu.addLiquidityAndFeeStake{value: 0.012 ether}(tokenIds, 0, type(uint256).max, 1);
     }
 }

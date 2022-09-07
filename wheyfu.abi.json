@@ -104,6 +104,170 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "bondId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "rewardPerTokenCheckpoint",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint128",
+            "name": "depositAmount",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint32",
+            "name": "depositTimestamp",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "termIndex",
+            "type": "uint8"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct FeeBonding.FeeBond",
+        "name": "bond",
+        "type": "tuple"
+      }
+    ],
+    "name": "FeeStake",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "bondId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "rewardPerTokenCheckpoint",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint128",
+            "name": "depositAmount",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint32",
+            "name": "depositTimestamp",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "termIndex",
+            "type": "uint8"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct FeeBonding.FeeBond",
+        "name": "bond",
+        "type": "tuple"
+      }
+    ],
+    "name": "FeeUnstake",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "bondId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "rewardPerTokenCheckpoint",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint128",
+            "name": "depositAmount",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint32",
+            "name": "depositTimestamp",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "termIndex",
+            "type": "uint8"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct OptionBonding.OptionBond",
+        "name": "bond",
+        "type": "tuple"
+      }
+    ],
+    "name": "OptionStake",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "bondId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "rewardPerTokenCheckpoint",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint128",
+            "name": "depositAmount",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint32",
+            "name": "depositTimestamp",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "termIndex",
+            "type": "uint8"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct OptionBonding.OptionBond",
+        "name": "bond",
+        "type": "tuple"
+      }
+    ],
+    "name": "OptionUnstake",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "user",
@@ -148,47 +312,6 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "bondId",
-        "type": "uint256"
-      },
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "rewardPerTokenCheckpoint",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint96",
-            "name": "depositAmount",
-            "type": "uint96"
-          },
-          {
-            "internalType": "uint32",
-            "name": "depositTimestamp",
-            "type": "uint32"
-          },
-          {
-            "internalType": "uint8",
-            "name": "termIndex",
-            "type": "uint8"
-          }
-        ],
-        "indexed": false,
-        "internalType": "struct Bonding.Bond",
-        "name": "bond",
-        "type": "tuple"
-      }
-    ],
-    "name": "Stake",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": true,
         "internalType": "address",
         "name": "from",
@@ -208,47 +331,6 @@
       }
     ],
     "name": "Transfer",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "bondId",
-        "type": "uint256"
-      },
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "rewardPerTokenCheckpoint",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint96",
-            "name": "depositAmount",
-            "type": "uint96"
-          },
-          {
-            "internalType": "uint32",
-            "name": "depositTimestamp",
-            "type": "uint32"
-          },
-          {
-            "internalType": "uint8",
-            "name": "termIndex",
-            "type": "uint8"
-          }
-        ],
-        "indexed": false,
-        "internalType": "struct Bonding.Bond",
-        "name": "bond",
-        "type": "tuple"
-      }
-    ],
-    "name": "Unstake",
     "type": "event"
   },
   {
@@ -355,7 +437,41 @@
         "type": "uint256"
       }
     ],
-    "name": "addLiquidityAndStake",
+    "name": "addLiquidityAndFeeStake",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "tokenIds",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "minPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "termIndex",
+        "type": "uint256"
+      }
+    ],
+    "name": "addLiquidityAndOptionStake",
     "outputs": [
       {
         "internalType": "uint256",
@@ -404,19 +520,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "bondingNft",
-    "outputs": [
-      {
-        "internalType": "contract BondingNft",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -434,9 +537,9 @@
             "type": "uint256"
           },
           {
-            "internalType": "uint96",
+            "internalType": "uint128",
             "name": "depositAmount",
-            "type": "uint96"
+            "type": "uint128"
           },
           {
             "internalType": "uint32",
@@ -449,7 +552,7 @@
             "type": "uint8"
           }
         ],
-        "internalType": "struct Bonding.Bond",
+        "internalType": "struct OptionBonding.OptionBond",
         "name": "",
         "type": "tuple"
       }
@@ -611,6 +714,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "feeBondingNft",
+    "outputs": [
+      {
+        "internalType": "contract BondingNft",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -618,7 +734,48 @@
         "type": "uint256"
       }
     ],
-    "name": "earned",
+    "name": "feeBonds",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "rewardPerTokenCheckpoint",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint128",
+            "name": "depositAmount",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint32",
+            "name": "depositTimestamp",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "termIndex",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct FeeBonding.FeeBond",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "feeEarned",
     "outputs": [
       {
         "internalType": "uint256",
@@ -627,6 +784,88 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "feeRewardPerTokenStored",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint128",
+        "name": "amount",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint256",
+        "name": "termIndex",
+        "type": "uint256"
+      }
+    ],
+    "name": "feeStake",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "feeStakedTotalSupply",
+    "outputs": [
+      {
+        "internalType": "uint128",
+        "name": "",
+        "type": "uint128"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "feeTotalBondSupply",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "feeUnstake",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "rewardAmount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -811,24 +1050,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "numAssets",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "nonces",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "multiConvertToOption",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "name",
     "outputs": [
@@ -993,7 +1214,7 @@
       },
       {
         "internalType": "uint256[]",
-        "name": "floorAssetTokenIds",
+        "name": "",
         "type": "uint256[]"
       }
     ],
@@ -1118,6 +1339,51 @@
   },
   {
     "inputs": [],
+    "name": "optionBondTotalSupply",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "optionBondingNft",
+    "outputs": [
+      {
+        "internalType": "contract BondingNft",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "optionEarned",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "optionExpiration",
     "outputs": [
       {
@@ -1127,6 +1393,75 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "optionRewardPerTokenStored",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint128",
+        "name": "amount",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint256",
+        "name": "termIndex",
+        "type": "uint256"
+      }
+    ],
+    "name": "optionStake",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "optionStakedTotalSupply",
+    "outputs": [
+      {
+        "internalType": "uint128",
+        "name": "",
+        "type": "uint128"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "optionUnstake",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "callOptionAmount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1226,19 +1561,6 @@
   {
     "inputs": [],
     "name": "rewardPerToken",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "rewardPerTokenStored",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1371,40 +1693,16 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint96",
-        "name": "amount",
-        "type": "uint96"
-      },
-      {
-        "internalType": "uint256",
-        "name": "termIndex",
-        "type": "uint256"
-      }
-    ],
-    "name": "stake",
+    "inputs": [],
+    "name": "skim",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "tokenId",
+        "name": "",
         "type": "uint256"
       }
     ],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "stakedTotalSupply",
-    "outputs": [
-      {
-        "internalType": "uint96",
-        "name": "",
-        "type": "uint96"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1527,22 +1825,9 @@
     "name": "tokenUri",
     "outputs": [
       {
-        "internalType": "contract TokenUri",
+        "internalType": "contract ERC721",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "totalBondSupply",
-    "outputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
       }
     ],
     "stateMutability": "view",
@@ -1581,25 +1866,6 @@
     ],
     "name": "transferFrom",
     "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "unstake",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "callOptionAmount",
-        "type": "uint256"
-      }
-    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },

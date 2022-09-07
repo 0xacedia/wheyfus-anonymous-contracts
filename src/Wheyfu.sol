@@ -3,6 +3,7 @@ pragma solidity 0.8.16;
 
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
 import {ERC721, ERC721TokenReceiver} from "solmate/tokens/ERC721.sol";
 import {ERC721A} from "ERC721A/ERC721A.sol";
 import {Owned} from "solmate/auth/Owned.sol";
@@ -10,7 +11,6 @@ import {LSSVMPairMissingEnumerableETH} from "lssvm/LSSVMPairMissingEnumerableETH
 import {PuttyV2} from "putty-v2/PuttyV2.sol";
 import {PuttyV2Handler, IPuttyV2Handler} from "putty-v2/PuttyV2Handler.sol";
 
-import {TokenUri} from "./TokenUri.sol";
 import {MintBurnToken} from "./lib/MintBurnToken.sol";
 import {OptionBonding} from "./OptionBonding.sol";
 import {FeeBonding} from "./FeeBonding.sol";
@@ -61,7 +61,7 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
     mapping(address => uint256) public mintWhitelist;
 
     LSSVMPairMissingEnumerableETH public pair;
-    TokenUri public tokenUri;
+    ERC721 public tokenUri;
 
     /**
      * @notice Emitted when liquidity is added.
@@ -110,7 +110,7 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
      * @param _tokenUri The tokenURI contract.
      */
     function setTokenUri(address _tokenUri) public onlyOwner {
-        tokenUri = TokenUri(_tokenUri);
+        tokenUri = ERC721(_tokenUri);
     }
 
     /**
@@ -399,7 +399,8 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
      * @notice Tells putty that we support the handler interface.
      */
     function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
-        return interfaceId == type(IPuttyV2Handler).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IERC721Enumerable).interfaceId || interfaceId == type(IPuttyV2Handler).interfaceId
+            || super.supportsInterface(interfaceId);
     }
 
     /**

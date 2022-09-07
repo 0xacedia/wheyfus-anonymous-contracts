@@ -4,7 +4,6 @@ pragma solidity 0.8.16;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IERC1271} from "@openzeppelin/contracts/interfaces/IERC1271.sol";
-import {ERC721} from "solmate/tokens/ERC721.sol";
 import {Owned} from "solmate/auth/Owned.sol";
 import {PuttyV2} from "putty-v2/PuttyV2.sol";
 
@@ -47,7 +46,7 @@ contract OptionBonding is IERC1271, Owned {
     uint256[] public termBoosters = [1e18, 1.1e18, 1.2e18, 1.5e18, 2e18, 3e18];
 
     /// @notice The total amount of call option tokens to give out in bond rewards.
-    uint256 public constant TOTAL_REWARDS = 9000 * 1e18;
+    uint256 public constant TOTAL_REWARDS = 18_000 * 1e18;
 
     /// @notice The duration over which bond rewards are distributed.
     uint256 public constant REWARD_DURATION = 900 days;
@@ -70,14 +69,14 @@ contract OptionBonding is IERC1271, Owned {
     /// @notice The date at which rewards started being distributed.
     uint256 public immutable startAt = block.timestamp;
 
-    /// @notice The total amount of bonds in existence.
-    uint32 public optionBondTotalSupply;
-
     /// @notice The last calculated amount of rewards per token.
     uint256 public optionRewardPerTokenStored;
 
     /// @notice The last time at which staking rewards were calculated.
     uint32 public lastUpdateTime = uint32(block.timestamp);
+
+    /// @notice The total amount of bonds in existence.
+    uint32 public optionBondTotalSupply;
 
     /// @notice The total amount of synthetic supply being staked.
     /// @dev Calculated by summing total lp tokens staked * yield booster.
