@@ -11,9 +11,12 @@
     "solhint": "solhint --config ./.solhint.json 'src/**/*.sol' --fix",
     "solhint:check": "solhint --config ./.solhint.json 'src/**/*.sol'",
     "lint": "npm run prettier && npm run solhint",
-    "lint:check": "npm run prettier:check && npm run solhint:check",
+    "lint:check": "npm run prettier:check && npm run solhint:check"
   },
   "dependencies": {
+    "ethers": "^5.7.0",
+    "keccak256": "^1.0.6",
+    "merkletreejs": "^0.2.32",
     "prettier": "^2.7.1",
     "prettier-plugin-solidity": "^1.0.0-dev.23",
     "solhint": "^3.3.7"
