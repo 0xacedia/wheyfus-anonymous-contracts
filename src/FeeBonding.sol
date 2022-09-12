@@ -118,10 +118,9 @@ contract FeeBonding {
         // update the rewards for everyone
         skim();
 
-        // mint the bond
+        // update the bond supply
         feeTotalBondSupply += 1;
         tokenId = feeTotalBondSupply;
-        feeBondingNft.mint(msg.sender, tokenId);
 
         // set the bond parameters
         FeeBond storage bond = _bonds[tokenId];
@@ -135,6 +134,9 @@ contract FeeBonding {
 
         // transfer lp tokens from sender
         lpToken.transferFrom(msg.sender, address(this), amount);
+
+        // mint the bond
+        feeBondingNft.mint(msg.sender, tokenId);
 
         emit FeeStake(tokenId, bond);
     }

@@ -128,10 +128,9 @@ contract OptionBonding is IERC1271, Owned {
         // update the rewards for everyone
         optionRewardPerTokenStored = uint256(rewardPerToken());
 
-        // mint the bond
+        // update bond supply
         optionBondTotalSupply += 1;
         tokenId = optionBondTotalSupply;
-        optionBondingNft.mint(msg.sender, tokenId);
 
         // set the bond parameters
         OptionBond storage bond = _bonds[tokenId];
@@ -146,6 +145,9 @@ contract OptionBonding is IERC1271, Owned {
 
         // transfer lp tokens from sender
         lpToken.transferFrom(msg.sender, address(this), amount);
+
+        // mint the bond
+        optionBondingNft.mint(msg.sender, tokenId);
 
         emit OptionStake(tokenId, bond);
     }
