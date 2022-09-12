@@ -388,23 +388,10 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
      */
 
     /**
-     * @notice When the call option is exercised putty will call this function. it mints nfts to the exerciser.
-     * @dev Should only be callable by putty. We defer the mint to here instead of on call option creation to save gas.
-     */
-    function onExercise(PuttyV2.Order memory order, address exerciser, uint256[] memory) public override {
-        // If we were the maker of the order then it must be a short call and the tokens
-        // need to be minted because we initially skipped transferring them in.
-        if (order.maker == address(this) && msg.sender == address(putty)) {
-            _mintTo(type(uint256).max - order.erc721Assets[0].tokenId, exerciser, address(putty));
-        }
-    }
-
-    /**
      * @notice Tells putty that we support the handler interface.
      */
     function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
-        return interfaceId == type(IERC721Enumerable).interfaceId || interfaceId == type(IPuttyV2Handler).interfaceId
-            || super.supportsInterface(interfaceId);
+        return interfaceId == type(IERC721Enumerable).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**
@@ -449,10 +436,13 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
         }
 
         // if putty is trying to send tokens for a tokenId greater than max supply
-        // then skip. the only way this should ever be reachable is if the bonding contract
+        // then mint tokens. the only way this should ever be reachable is if the bonding contract
         // minted an option. otherwise putty should never have received tokens with ids greater
-        // than the max supply.
+        // than the max supply. When the call option is exercised putty will call this function. it
+        // mints nfts to the exerciser. Should only be callable by putty. We defer the mint to here
+        // instead of on call option creation to save gas.
         if (from == address(putty) && tokenId > MAX_SUPPLY && msg.sender == address(putty)) {
+            _mintTo(type(uint256).max - tokenId, to, address(putty));
             return;
         }
 
