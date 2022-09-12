@@ -136,13 +136,13 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
         // check whitelist is not closed
         require(!closedWhitelist, "Whitelist has been closed");
 
-        // check whitelisted supply + amount is less than the max supply
-        require(whitelistedSupply + amount <= MAX_SUPPLY, "Max supply already reached");
-
         // increment/decrement the new whitelistedSupply
         uint256 oldAmount = mintWhitelist[target];
         whitelistedSupply -= oldAmount;
         whitelistedSupply += amount;
+
+        // check whitelisted supply is less than the max supply
+        require(whitelistedSupply <= MAX_SUPPLY, "Max supply already reached");
 
         // save the new whitelist amount to the target
         mintWhitelist[target] = amount;
