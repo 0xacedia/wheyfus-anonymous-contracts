@@ -68,10 +68,9 @@ contract DeployScript is Script {
         // authorize wheyfu to mint/burn call option tokens then give up control
         co.setMinterBurner(address(wheyfu), true);
 
-        // TODO: JUST FOR TESTING (REMOVE THIS AT LAUNCH) ______
+        // mint 10 call option tokens to the owner for testing
         co.setMinterBurner(msg.sender, true);
-        co.mint(msg.sender, 500 * 1e18);
-        // TODO: JUST FOR TESTING (REMOVE THIS AT LAUNCH) ^^^^^
+        co.mint(msg.sender, 10 * 1e18);
 
         co.setOwner(address(wheyfu));
 
@@ -79,7 +78,7 @@ contract DeployScript is Script {
         wheyfu.whitelistMinter(address(putty), 18_000);
 
         // seed the pair with some liquidity
-        wheyfu.whitelistMinter(msg.sender, 50);
+        wheyfu.whitelistMinter(msg.sender, 20);
         wheyfu.mint(20);
 
         uint256[] memory tokenIds = new uint256[](5);
@@ -100,7 +99,7 @@ contract DeployScript is Script {
 
         // whitelist the mint contract for 9k wheyfus
         wheyfu.whitelistMinter(address(mint), 9000);
-        mint.setMerkleRoot(generateMerkleRoot("discord-whitelist.json"));
+        // mint.setMerkleRoot(generateMerkleRoot("discord-whitelist.json"));
         // bytes32[] memory proof = generateMerkleProof("discord-whitelist.json", msg.sender);
         // mint.mint(1, proof);
 
