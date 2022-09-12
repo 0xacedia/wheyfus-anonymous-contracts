@@ -76,22 +76,18 @@ user's wallet. Again, this is very similar to the UNI-v2 logic.
 
 There is also another function:
 
-**onExercise(PuttyV2.Order memory order, address exerciser, uint256[] memory)**
+**safeTransferFrom overrides**
 
-This is called by putty when the call option for the wheyfus are being exercised. When this happens,
-we mint N amount of wheyfus to the exerciser's wallet. The amount of wheyfus to mint is determined by
-the tokenId of the first asset in ERC721Assets. The amount to mint is type(uint256).max - tokenId.
-
-Related to this is the overriden function safeTransferFrom. In this function we make 2 modifications.
+In this function we make 2 modifications.
 The first modification is to skip transferring if mintingOption is set to 2. When minting an option
 putty will try to transfer wheyfus from the Wheyfu.sol contract into putty. We skip this transfer to 
-save gas. Instead we do a mint to the exerciser's wallet at the point of exercise via the onExercise 
-method.
+save gas. Instead we do a mint to the exerciser's wallet at the point of exercise via another branch
+in the safeTransferFrom function.
 
 The second modification is to skip transferring if the tokenId is greater than the MAX_SUPPLY, from == putty
 and msg.sender == putty. This because on exercise putty will try to transfer the very large tokenId to the
-exerciser. Of course, this token doesn't actually exist. So we skip transferring it (N amount of wheyfus) will
-be minted via onExercise instead.
+exerciser. Of course, this token doesn't actually exist. So we skip transferring it and N amount of wheyfus will
+be minted to the `to` address instead.
 
 These modifications are a bit strange, but they save quite a lot of gas. Instead of the regular flow of
 ```
