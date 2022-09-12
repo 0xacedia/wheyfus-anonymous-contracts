@@ -182,9 +182,9 @@ contract FeeBonding {
      */
     function feeEarned(uint256 tokenId) public view returns (uint256) {
         FeeBond storage bond = _bonds[tokenId];
-        uint256 syntheticAmount = (bond.depositAmount * termBoosters[bond.termIndex]) / 1e18;
+        uint256 boostedAmount = bond.depositAmount * termBoosters[bond.termIndex];
 
-        return (syntheticAmount * (feeRewardPerTokenStored - bond.rewardPerTokenCheckpoint)) / 1e18;
+        return ((boostedAmount) * (feeRewardPerTokenStored - bond.rewardPerTokenCheckpoint)) / 1e36;
     }
 
     /**

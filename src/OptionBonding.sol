@@ -205,9 +205,9 @@ contract OptionBonding is IERC1271, Owned {
      */
     function optionEarned(uint256 tokenId) public view returns (uint256) {
         OptionBond storage bond = _bonds[tokenId];
-        uint256 syntheticAmount = (bond.depositAmount * termBoosters[bond.termIndex]) / 1e18;
+        uint256 boostedAmount = bond.depositAmount * termBoosters[bond.termIndex];
 
-        return (syntheticAmount * (rewardPerToken() - bond.rewardPerTokenCheckpoint)) / 1e18;
+        return (boostedAmount * (rewardPerToken() - bond.rewardPerTokenCheckpoint)) / 1e36;
     }
 
     /**
