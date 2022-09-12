@@ -232,6 +232,9 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
         uint256 _price = _tokenReserves > 0 && _nftReserves > 0 ? _tokenReserves / _nftReserves : 0;
         require(_price <= maxPrice && _price >= minPrice, "Price slippage");
 
+        // check min eth amount was sent
+        require(msg.value > 0.0001 ether, "Must send at least 0.0001 ether");
+
         // update sudoswap reserves
         _updateReserves(_tokenReserves + msg.value, _nftReserves + tokenIds.length);
 
