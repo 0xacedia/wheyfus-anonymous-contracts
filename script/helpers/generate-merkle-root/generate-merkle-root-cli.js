@@ -1,4 +1,3 @@
-const { defaultAbiCoder } = require("@ethersproject/abi");
 const { generateMerkleRoot } = require("./generate-merkle-root");
 
 const main = async () => {
