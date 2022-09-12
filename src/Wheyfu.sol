@@ -9,7 +9,6 @@ import {ERC721A} from "ERC721A/ERC721A.sol";
 import {Owned} from "solmate/auth/Owned.sol";
 import {LSSVMPairMissingEnumerableETH} from "lssvm/LSSVMPairMissingEnumerableETH.sol";
 import {PuttyV2} from "putty-v2/PuttyV2.sol";
-import {PuttyV2Handler, IPuttyV2Handler} from "putty-v2/PuttyV2Handler.sol";
 import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 
 import {MintBurnToken} from "./lib/MintBurnToken.sol";
@@ -43,7 +42,7 @@ import {FeeBonding} from "./FeeBonding.sol";
  *
  * @author 0xacedia
  */
-contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, PuttyV2Handler {
+contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver {
     /// @notice The max supply of wheyfus.
     /// @dev 18k for yield farming, 9k for free mint, 3k for team.
     uint256 public constant MAX_SUPPLY = 30_000;
