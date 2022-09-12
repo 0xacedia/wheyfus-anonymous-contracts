@@ -99,7 +99,8 @@ contract FeeBonding {
      */
     function skim() public returns (uint256) {
         // skim the fees
-        uint256 fees = address(pair).balance - pair.spotPrice();
+        uint256 tokenReserves = pair.spotPrice();
+        uint256 fees = address(pair).balance > tokenReserves ? address(pair).balance - tokenReserves : 0;
         pair.withdrawETH(fees);
 
         // distribute the fees to stakers

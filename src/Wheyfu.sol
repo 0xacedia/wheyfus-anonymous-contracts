@@ -10,6 +10,7 @@ import {Owned} from "solmate/auth/Owned.sol";
 import {LSSVMPairMissingEnumerableETH} from "lssvm/LSSVMPairMissingEnumerableETH.sol";
 import {PuttyV2} from "putty-v2/PuttyV2.sol";
 import {PuttyV2Handler, IPuttyV2Handler} from "putty-v2/PuttyV2Handler.sol";
+import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 
 import {MintBurnToken} from "./lib/MintBurnToken.sol";
 import {OptionBonding} from "./OptionBonding.sol";
@@ -256,7 +257,7 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
         }
 
         // deposit eth to sudoswap pool
-        SafeTransferLib.safeTransferETH(pair, msg.value);
+        SafeTransferLib.safeTransferETH(address(pair), msg.value);
 
         emit AddLiquidity(msg.value, tokenIds.length, shares);
     }
