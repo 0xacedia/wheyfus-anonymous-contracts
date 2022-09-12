@@ -8,6 +8,7 @@ import {ERC721} from "solmate/tokens/ERC721.sol";
 import {Owned} from "solmate/auth/Owned.sol";
 import {PuttyV2} from "putty-v2/PuttyV2.sol";
 import {LSSVMPairMissingEnumerableETH} from "lssvm/LSSVMPairMissingEnumerableETH.sol";
+import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 
 import {MintBurnToken} from "./lib/MintBurnToken.sol";
 import {BondingNft} from "./lib/BondingNft.sol";
@@ -168,7 +169,7 @@ contract FeeBonding {
 
         // send fee rewards to sender
         rewardAmount = feeEarned(tokenId);
-        payable(msg.sender).transfer(rewardAmount);
+        SafeTransferLib.safeTransferETH(msg.sender, rewardAmount);
 
         emit FeeUnstake(tokenId, bond);
     }

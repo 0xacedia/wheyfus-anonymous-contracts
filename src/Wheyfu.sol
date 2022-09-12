@@ -256,7 +256,7 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
         }
 
         // deposit eth to sudoswap pool
-        payable(pair).transfer(msg.value);
+        SafeTransferLib.safeTransferETH(pair, msg.value);
 
         emit AddLiquidity(msg.value, tokenIds.length, shares);
     }
@@ -298,7 +298,7 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver, Putty
         }
 
         // send eth to user
-        payable(msg.sender).transfer(tokenAmount);
+        SafeTransferLib.safeTransferETH(msg.sender, tokenAmount);
 
         emit RemoveLiquidity(tokenAmount, tokenIds.length, shares);
     }
