@@ -418,7 +418,8 @@ contract Wheyfu is FeeBonding, OptionBonding, ERC721, ERC721TokenReceiver {
 
         require(
             to.code.length == 0
-                || ERC721TokenReceiver(to).onERC721Received(msg.sender, from, id, "") == ERC721TokenReceiver.onERC721Received.selector,
+                || ERC721TokenReceiver(to).onERC721Received(msg.sender, from, id, "")
+                    == ERC721TokenReceiver.onERC721Received.selector,
             "UNSAFE_RECIPIENT"
         );
     }

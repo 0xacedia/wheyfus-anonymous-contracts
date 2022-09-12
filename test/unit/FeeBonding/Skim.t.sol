@@ -45,7 +45,9 @@ contract SkimTest is Fixture {
 
         // assert
         assertEq(
-            w.feeRewardPerTokenStored(), (amount * 1e18) / stakeAmount, "Should have updated fee reward per token stored"
+            w.feeRewardPerTokenStored(),
+            (amount * 1e18) / stakeAmount,
+            "Should have updated fee reward per token stored"
         );
     }
 

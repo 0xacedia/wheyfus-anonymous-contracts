@@ -84,17 +84,25 @@ contract TokenUri {
 
         return string.concat(
             /* solhint-disable quotes */
-            string.concat('<svg xmlns="http://www.w3.org/2000/svg" width="350" height="350" style="background:', color, '">'),
+            string.concat(
+                '<svg xmlns="http://www.w3.org/2000/svg" width="350" height="350" style="background:', color, '">'
+            ),
             svg.text(
-                string.concat(svg.prop("x", "10"), svg.prop("y", "20"), svg.prop("font-size", "14"), svg.prop("fill", "white")),
+                string.concat(
+                    svg.prop("x", "10"), svg.prop("y", "20"), svg.prop("font-size", "14"), svg.prop("fill", "white")
+                ),
                 text
             ),
             svg.text(
-                string.concat(svg.prop("x", "10"), svg.prop("y", "40"), svg.prop("font-size", "14"), svg.prop("fill", "white")),
+                string.concat(
+                    svg.prop("x", "10"), svg.prop("y", "40"), svg.prop("font-size", "14"), svg.prop("fill", "white")
+                ),
                 "I'm not yet revealed :3"
             ),
             svg.text(
-                string.concat(svg.prop("x", "10"), svg.prop("y", "60"), svg.prop("font-size", "14"), svg.prop("fill", "white")),
+                string.concat(
+                    svg.prop("x", "10"), svg.prop("y", "60"), svg.prop("font-size", "14"), svg.prop("fill", "white")
+                ),
                 string.concat("my wholly unique identifier is #", Strings.toString(tokenId))
             ),
             "</svg>"
@@ -105,9 +113,13 @@ contract TokenUri {
     function renderCallOptionSvg(uint256 tokenId) public view returns (string memory) {
         return string.concat(
             /* solhint-disable quotes */
-            string.concat('<svg xmlns="http://www.w3.org/2000/svg" width="350" height="350" style="background:', "pink", '">'),
+            string.concat(
+                '<svg xmlns="http://www.w3.org/2000/svg" width="350" height="350" style="background:', "pink", '">'
+            ),
             svg.text(
-                string.concat(svg.prop("x", "10"), svg.prop("y", "20"), svg.prop("font-size", "16"), svg.prop("fill", "white")),
+                string.concat(
+                    svg.prop("x", "10"), svg.prop("y", "20"), svg.prop("font-size", "16"), svg.prop("fill", "white")
+                ),
                 string.concat("Fresh: Ticket for ", Strings.toString(type(uint256).max - tokenId), " wheyfus")
             ),
             "</svg>"

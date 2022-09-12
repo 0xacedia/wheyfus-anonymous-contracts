@@ -16,7 +16,9 @@ import {Mint} from "../src/Mint.sol";
 
 contract DeployScript is Script {
     function run() public {
-        vm.startBroadcast();
+        address deployer = vm.rememberKey(vm.envUint("PRIVATE_KEY"));
+
+        vm.startBroadcast(deployer);
 
         // create the call option and lp tokens
         MintBurnToken co = new MintBurnToken(
@@ -69,8 +71,8 @@ contract DeployScript is Script {
         co.setMinterBurner(address(wheyfu), true);
 
         // mint 10 call option tokens to the owner for testing
-        co.setMinterBurner(msg.sender, true);
-        co.mint(msg.sender, 10 * 1e18);
+        co.setMinterBurner(deployer, true);
+        co.mint(deployer, 10 * 1e18);
 
         co.setOwner(address(wheyfu));
 
@@ -78,7 +80,7 @@ contract DeployScript is Script {
         wheyfu.whitelistMinter(address(putty), 18_000);
 
         // seed the pair with some liquidity
-        wheyfu.whitelistMinter(msg.sender, 20);
+        wheyfu.whitelistMinter(deployer, 20);
         wheyfu.mint(20);
 
         uint256[] memory tokenIds = new uint256[](5);
@@ -100,7 +102,7 @@ contract DeployScript is Script {
         // whitelist the mint contract for 9k wheyfus
         wheyfu.whitelistMinter(address(mint), 9000);
         // mint.setMerkleRoot(generateMerkleRoot("discord-whitelist.json"));
-        // bytes32[] memory proof = generateMerkleProof("discord-whitelist.json", msg.sender);
+        // bytes32[] memory proof = generateMerkleProof("discord-whitelist.json", deployer);
         // mint.mint(1, proof);
 
         vm.stopBroadcast();
