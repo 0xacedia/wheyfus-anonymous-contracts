@@ -46,6 +46,15 @@ contract MintTest is Fixture {
         );
     }
 
+    function testItCannotMintMoreThanWhitelistAmount() public {
+        // arrange
+        w.whitelistMinter(address(this), 10);
+
+        // act
+        vm.expectRevert("Not whitelisted for this amount");
+        w.mint(11);
+    }
+
     function testItIncrementsTotalSupply() public {
         // act
         w.mint(2);

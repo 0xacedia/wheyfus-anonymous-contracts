@@ -52,8 +52,9 @@ contract DeployScript is Script {
         LSSVMPairFactory sudoFactory = LSSVMPairFactory(payable(vm.envAddress("SUDO_FACTORY_ADDRESS")));
         ICurve xykCurve = ICurve(vm.envAddress("SUDO_XYK_CURVE_ADDRESS"));
         uint256[] memory empty = new uint256[](0);
+        uint96 fee = 1e18 / 100; // 1%
         LSSVMPair pair = sudoFactory.createPairETH(
-            IERC721(address(wheyfu)), xykCurve, payable(0), LSSVMPair.PoolType.TRADE, 0, 0, 0, empty
+            IERC721(address(wheyfu)), xykCurve, payable(0), LSSVMPair.PoolType.TRADE, 0, fee, 0, empty
         );
         console.log("pair:");
         console.log(address(pair));
